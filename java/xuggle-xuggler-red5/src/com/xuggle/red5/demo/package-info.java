@@ -25,8 +25,8 @@
  * <h1>audiotranscoder</h1>
  * This demonstration intercepts any red5 stream that is published to it (e.g. "foo"),
  * strips out all the video, decodes the
- * audio, downsamples it to 5.5 khz stereo audio, and broadcasts a new stream with "copy_" prepending
- * the original stream (e.g. "copy_foo"), but this time sending out raw PCM data.
+ * audio, downsamples it to 5.5 khz stereo audio, and broadcasts a new stream with "xuggle_" prepending
+ * the original stream (e.g. "xuggle_"), but this time sending out raw PCM data.
  * 
  * <h1>videotranscoder</h1>
  * This demonstration intercepts any red5 stream that is published to it (e.g. "foo"),

@@ -41,7 +41,7 @@ import etm.core.timer.Java15NanoTimer;
 public class AudioTranscoderDemoAdapter extends MultiThreadedApplicationAdapter
 {
   private Logger log = LoggerFactory.getLogger(this.getClass());
-  private AudioTranscoderDemo resamplerDemo = new AudioTranscoderDemo("copy_");
+  private AudioTranscoderDemo resamplerDemo = new AudioTranscoderDemo("xuggle_");
   private EtmMonitor profiler = EtmManager.getEtmMonitor();
   private Timer profilerRenderer = new Timer("profilerRenderer", true);
   private int mProfilerFrequency=0;
