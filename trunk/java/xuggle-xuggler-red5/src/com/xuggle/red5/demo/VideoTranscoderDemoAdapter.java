@@ -55,7 +55,7 @@ import etm.core.timer.Java15NanoTimer;
  * stream with a unique name (e.g. "my_stream").
  * </p><p>
  * To hear your transcoded audio stream, connect to the same application and then playback
- * a stream that has the same unique name, but with "copy_" appended to it (e.g. "copy_my_stream").
+ * a stream that has the same unique name, but with "xuggle_" appended to it (e.g. "xuggle_my_stream").
  * </p><p>
  * You should hear the audio you are broadcasting and see the video you are broadcasting,
  * just re-encoded at the new parameters.  Please
@@ -68,7 +68,7 @@ import etm.core.timer.Java15NanoTimer;
 public class VideoTranscoderDemoAdapter extends MultiThreadedApplicationAdapter
 {
   private Logger log = LoggerFactory.getLogger(this.getClass());
-  private VideoTranscoderDemo resamplerDemo = new VideoTranscoderDemo("copy_");
+  private VideoTranscoderDemo resamplerDemo = new VideoTranscoderDemo("xuggle_");
   private EtmMonitor profiler = EtmManager.getEtmMonitor();
   private Timer profilerRenderer = new Timer("profilerRenderer", true);
   private int mProfilerFrequency=0;
