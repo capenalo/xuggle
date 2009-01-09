@@ -889,11 +889,12 @@ public class Transcoder implements Runnable
         point.collect();
       }
       if (retval <= 0) {
-        throw new RuntimeException(
-            "Could not encode any video: " + retval);
+        // If we fail to encode, complain loudly but still keep going
+        log.error("could not encode video picture; continuing anyway");
+      } else {
+        log.debug("encode video completed");
+        numBytesConsumed += retval;
       }
-      log.debug("encode video completed");
-      numBytesConsumed += retval;
       if (oPacket.isComplete()) {
         writePacket(oPacket);
       }
@@ -1055,8 +1056,10 @@ public class Transcoder implements Runnable
         point.collect();
       }
       if (retval <= 0) {
-        throw new RuntimeException(
-            "Could not encode any audio: " + retval);
+        // If we fail to encode, complain loudly but still keep going
+        log.error("could not encode audio samples; continuing anyway");
+        // and break the loop since these samples are now suspect
+        break;
       }
       log.debug("encode audio completed");
 
