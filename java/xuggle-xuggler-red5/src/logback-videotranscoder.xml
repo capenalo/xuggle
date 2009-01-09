@@ -21,6 +21,6 @@
     <appender-ref ref="VIDEOTX" />
   </root>	
   <logger name="com.xuggle">
-    <level value="DEBUG" />
-  </logger>		
+    <level value="INFO" />
+  </logger>
 </configuration>

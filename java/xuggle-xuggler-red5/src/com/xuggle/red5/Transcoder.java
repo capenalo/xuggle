@@ -188,7 +188,7 @@ public class Transcoder implements Runnable
         throw new IllegalArgumentException("must set video width when outputting video");
       if (mOutputInfo.getVideoCodec() == ICodec.ID.CODEC_ID_NONE)
         throw new IllegalArgumentException("must set video codec when outputting video");
-      if (!IVideoResampler.isSupported())
+      if (!IVideoResampler.isSupported(IVideoResampler.Feature.FEATURE_IMAGERESCALING))
         log.warn("Your installed version of AAFFMPEG doesn't support video resampling; Transcoding will fail if resizing is required");
     }
     if (!(mOutputInfo.hasAudio() || mOutputInfo.hasVideo()))
