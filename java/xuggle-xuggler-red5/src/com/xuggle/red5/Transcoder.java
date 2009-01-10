@@ -20,6 +20,7 @@
  */
 package com.xuggle.red5;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.stream.IBroadcastStream;
 import org.red5.server.api.stream.IStreamListener;
 import org.red5.server.api.stream.IStreamPacket;
@@ -27,7 +28,6 @@ import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
 import org.red5.server.net.rtmp.event.VideoData;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.xuggle.xuggler.IAudioResampler;
 import com.xuggle.xuggler.IAudioSamples;
@@ -69,7 +69,7 @@ import etm.core.monitor.EtmPoint;
  */
 public class Transcoder implements Runnable
 {
-  final private Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
   private final EtmMonitor profiler = EtmManager.getEtmMonitor();
 
   // This line initializes the AAFFMPEG IO libraries and gets a factory

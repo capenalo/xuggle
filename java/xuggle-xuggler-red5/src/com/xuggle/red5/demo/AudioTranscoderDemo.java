@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.IContext;
 import org.red5.server.api.IScope;
 import org.red5.server.api.stream.IBroadcastStream;
@@ -70,7 +70,7 @@ import com.xuggle.red5.io.BroadcastStream;
  */
 public class AudioTranscoderDemo
 {
-  final private Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
   final private String mStreamPrefix;
   final private Map<String, BroadcastStream> mOutputStreams = new HashMap<String, BroadcastStream>();
   final private Map<String, Transcoder> mTranscoders = new HashMap<String, Transcoder>();

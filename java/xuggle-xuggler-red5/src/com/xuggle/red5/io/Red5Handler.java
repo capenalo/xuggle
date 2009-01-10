@@ -27,6 +27,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.red5.io.amf.Output;
 import org.red5.io.object.Serializer;
 import org.red5.io.utils.IOUtils;
+import org.red5.logging.Red5LoggerFactory;
 
 import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
@@ -36,7 +37,6 @@ import org.red5.server.net.rtmp.event.VideoData;
 import org.red5.server.stream.IStreamData;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IRational;
@@ -72,7 +72,7 @@ public class Red5Handler implements IURLProtocolHandler
   // Include following 4-byte "size of prior tag"
   private static final int FLV_TAG_HEADER_SIZE = 11 + 4;
 
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
 
   IRTMPEventIOHandler mHandler;
 

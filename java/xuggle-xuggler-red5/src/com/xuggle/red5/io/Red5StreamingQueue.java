@@ -25,8 +25,8 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.xuggle.red5.io.Red5Message.Type;
 import com.xuggle.utils.TimeValue;
@@ -54,7 +54,7 @@ import etm.core.monitor.EtmPoint;
 public class Red5StreamingQueue extends LinkedBlockingQueue<Red5Message>
 implements IRTMPEventIOHandler
 {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
   private final EtmMonitor profiler = EtmManager.getEtmMonitor();
 
   /**

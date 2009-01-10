@@ -23,10 +23,10 @@ package com.xuggle.red5.demo;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.adapter.MultiThreadedApplicationAdapter;
 import org.red5.server.api.stream.IBroadcastStream;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import etm.core.configuration.BasicEtmConfigurator;
 import etm.core.configuration.EtmManager;
@@ -40,7 +40,7 @@ import etm.core.timer.Java15NanoTimer;
  */
 public class AudioTranscoderDemoAdapter extends MultiThreadedApplicationAdapter
 {
-  private Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
   private AudioTranscoderDemo resamplerDemo = new AudioTranscoderDemo("xuggle_");
   private EtmMonitor profiler = EtmManager.getEtmMonitor();
   private Timer profilerRenderer = new Timer("profilerRenderer", true);

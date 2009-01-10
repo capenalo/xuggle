@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.IScope;
 import org.red5.server.api.event.IEvent;
 import org.red5.server.api.stream.IBroadcastStream;
@@ -48,7 +49,6 @@ import org.red5.server.stream.codec.StreamCodecInfo;
 import org.red5.server.stream.message.RTMPMessage;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.xuggle.red5.demo.AudioTranscoderDemo;
 
@@ -68,7 +68,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
 {
   /** Listeners to get notified about received packets. */
   private Set<IStreamListener> mListeners = new CopyOnWriteArraySet<IStreamListener>();
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
   private final EtmMonitor profiler = EtmManager.getEtmMonitor();
 
   private String mPublishedName;

@@ -21,12 +21,12 @@
 package com.xuggle.red5.io;
 
 import org.apache.mina.common.ByteBuffer;
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
 import org.red5.server.net.rtmp.event.Notify;
 import org.red5.server.net.rtmp.event.VideoData;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import etm.core.configuration.EtmManager;
 import etm.core.monitor.EtmMonitor;
@@ -46,7 +46,7 @@ import etm.core.monitor.EtmPoint;
  */
 public class Red5Message
 {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  final private Logger log = Red5LoggerFactory.getLogger(this.getClass());
   private final EtmMonitor profiler = EtmManager.getEtmMonitor();
 
   /**
