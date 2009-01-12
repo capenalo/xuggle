@@ -4,11 +4,11 @@ all the SVN dependencies needed to recreate the package.
 Xuggle Version: 1.15.66.RC1
 
 - Xuggle Versions
-xuggle: http://xuggle.googlecode.com/svn/trunk: 65
+xuggle: http://xuggle.googlecode.com/svn/trunk: 66
 
 - Dependencies
 cxxtest: http://theyard.googlecode.com/svn/theyard/code/trunk/share/gnu/cxxtest/cxxtest-3.10.1 : 170
 ffmpeg: svn://svn.mplayerhq.hu/ffmpeg/trunk : 16564
-libswscale: svn://svn.ffmpeg.org/mplayer/trunk/libswscale : 28281
+libswscale: svn://svn.ffmpeg.org/mplayer/trunk/libswscale : 28306
 libmp3lame: http://downloads.sourceforge.net/lame/lame-398-2.tar.gz: 3.98.2
 libspeex: http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz: 1.2 RC1
