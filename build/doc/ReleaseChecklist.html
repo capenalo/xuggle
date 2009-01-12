@@ -194,7 +194,10 @@ Adding a new feature that is 100% backwards compatibile, but did not require cha
     </p>
     <ul>
       <li>
-        Document proposed SVN revision, and SVN revision of any Externals.
+        Document proposed SVN revision, and SVN revision of any Externals in a file called release.txt in root directory
+      </li>
+      <li>
+        Make sure revision numbers in configure.ac, build.xml, and any windows installers are correct
       </li>
       <li>
         Build candidate on each supported OS
@@ -209,6 +212,10 @@ Adding a new feature that is 100% backwards compatibile, but did not require cha
       <li>
         If the library has native code, make sure you're running with our hacked version of Swig that adds the Doxygen comments as Javadoc
       </li>
+      <li>
+        Create any windows installers and test that they work
+      </li>
+      
       <li>
         Check contents of INSTALL in the library top level directory and make sure it's still right.
       </li>
@@ -302,6 +309,7 @@ Adding a new feature that is 100% backwards compatibile, but did not require cha
     
       <li>
         You should use Packages (in Java) or Namepsaces (in C++) for any objects you create.
+      Packages should be under &quot;com.xuggle&quot;; Namespaces should be under &quot;com::xuggle&quot;.
       </li>
       <li>
         Static methods SHOULD think carefully about creating any long-term caches and objects; they won't be cleaned up by garbage collectors.
