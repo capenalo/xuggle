@@ -45,9 +45,9 @@ import etm.core.timer.Java15NanoTimer;
  * application.
  * </p><p>
  * <b>
- * YOU MUST MAKE SURE YOU HAVE INSTALLED AAFFMPEG ON THE MACHINE RUNNING YOUR RED5 SERVER.
+ * YOU MUST MAKE SURE YOU HAVE INSTALLED XUGGLER ON THE MACHINE RUNNING YOUR RED5 SERVER.
  * 
- * See http://aaffmpeg.theyard.net/ for instructions on how to install it.
+ * See http://www.xuggle.com/xuggler
  * </b>
  * </p><p>
 

@@ -49,9 +49,9 @@ import com.xuggle.red5.io.BroadcastStream;
  * application.
  * </p><p>
  * <b>
- * YOU MUST MAKE SURE YOU HAVE INSTALLED AAFFMPEG ON THE MACHINE RUNNING YOUR RED5 SERVER.
+ * YOU MUST MAKE SURE YOU HAVE INSTALLED XUGGLER ON THE MACHINE RUNNING YOUR RED5 SERVER.
  * 
- * See http://aaffmpeg.theyard.net/ for instructions on how to install it.
+ * See http://www.xuggle.com/xuggler
  * </b>
  * </p><p>
 
@@ -59,7 +59,7 @@ import com.xuggle.red5.io.BroadcastStream;
  * stream with a unique name (e.g. "my_stream").
  * </p><p>
  * To hear your transcoded audio stream, connect to the same application and then playback
- * a stream that has the same unique name, but with "copy_" appended to it (e.g. "copy_my_stream").
+ * a stream that has the same unique name, but with "xuggle_" appended to it (e.g. "xuggle_my_stream").
  * </p><p>
  * You should hear the audio you are broadcasting, just re-encoded at the new parameters.  Please
  * note that while you will hear a latency in this audio, approximately 3-msec is added by our transcoder --
