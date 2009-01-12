@@ -9,5 +9,5 @@ against the FFMPEG tip of tree.
 Distributions will have a specific FFMPEG they hold captive.
 
 For this release we have pegged FFMPEG To:
-ffmpeg: r16564
+ffmpeg: r16488
 libswscale: r28306
