@@ -1,6 +1,6 @@
 <ivy-module version="2.0">
 
-  <info organisation="xuggle" module="xuggle-utils" revision="1.0.13" status="integration" publication="20090107115449"/>
+  <info organisation="xuggle" module="xuggle-utils" revision="1.15.65" status="integration" publication="20090112151216"/>
 
   <configurations>
     <conf name="default" description="default configuration"/>
@@ -13,8 +13,8 @@
   <dependencies defaultconfmapping="*->*">
     <!-- Logging --> 
     <dependency org="red5" name="slf4j-api" rev="1.5.6"/>
-    <dependency org="red5" name="logback-core" rev="0.9.11"/>
-    <dependency org="red5" name="logback-classic" rev="0.9.11"/>
+    <dependency org="red5" name="logback-core" rev="0.9.14"/>
+    <dependency org="red5" name="logback-classic" rev="0.9.14"/>
 
     <!--  Include for JUnit Test framework utils -->
     <dependency org="junit" name="junit" rev="4.5"/>

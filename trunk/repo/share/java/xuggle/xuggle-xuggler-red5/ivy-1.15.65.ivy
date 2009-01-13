@@ -1,5 +1,5 @@
 <ivy-module version="1.0">
-  <info organisation="xuggle" module="xuggle-red5" revision="1.0.13" status="integration" publication="20090107120845"/>
+  <info organisation="xuggle" module="xuggle-red5" revision="1.15.65" status="integration" publication="20090112170843"/>
   <configurations>
     <conf name="default"/>
     <conf name="test" extends="default" description="Unit testing dependencies"/>
@@ -20,11 +20,11 @@
 
     <!-- Logging --> 
     <dependency org="red5" name="slf4j-api" conf="compile, test" rev="1.5.6"/>
-    <dependency org="red5" name="logback-core" conf="compile, test" rev="0.9.11"/>
-    <dependency org="red5" name="logback-classic" conf="compile, test" rev="0.9.11"/>
+    <dependency org="red5" name="logback-core" conf="compile, test" rev="0.9.14"/>
+    <dependency org="red5" name="logback-classic" conf="compile, test" rev="0.9.14"/>
 
     <!-- XML file loading -->
-    <dependency org="spring" name="spring-core" conf="compile, test" rev="2.5.5"/>
+    <dependency org="spring" name="spring-core" conf="compile, test" rev="2.5.6"/>
 
     <!-- Mina ByteBuffers -->
     <dependency org="mina" name="mina-core" conf="compile, test" rev="1.1.7"/>
