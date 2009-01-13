@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project
+  name="xuggle-xuggler-red5"
+  default="dist"
+  basedir="."
+  xmlns:ivy="antlib:org.apache.ivy.ant"
+  >
+  <description>
+    Builder for the Xuggle Red5 Java Library
+  </description>
+
+  <!-- IMPRORTANT: If this Java build depends on a Native library
+       you must also make sure you update the major and minor
+       revisions in that library's "configure.ac" file, and
+       regenerate the build scripts -->
+  <property name="library.version.major" value="1"/>
+  <property name="library.version.minor" value="15"/>
+
+  <!-- And bring in the standard build rules -->
+  <import file="mk/buildtools/buildhelper.xml"/>
+
+  <!-- And install the red5 app -->
+  <target name="install-red5"
+    description="Installed Red5 applications to $RED5_HOME">
+    <install-red5webapp name="audiotranscoder"/>
+    <install-red5webapp name="videotranscoder"/>
+  </target>
+  <target name="uninstall-red5"
+    description="Installed Red5 applications to $RED5_HOME">
+    <uninstall-red5webapp name="audiotranscoder"/>
+    <uninstall-red5webapp name="videotranscoder"/>
+  </target>
+
+
+</project>
+

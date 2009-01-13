@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project
+  name="xuggle-utils"
+  default="dist"
+  basedir="."
+  xmlns:ivy="antlib:org.apache.ivy.ant"
+  >
+  <description>
+    Builder for the The Yard Utility Java Library
+  </description>
+
+  <!-- set global properties for this build -->
+  <!-- IMPRORTANT: If this Java build depends on a Native library
+       you must also make sure you update the major and minor
+       revisions in that library's "configure.ac" file, and
+       regenerate the build scripts -->
+  <property name="library.version.major" value="1"/>
+  <property name="library.version.minor" value="15"/>
+
+  <!-- And bring in the standard build rules -->
+  <import file="mk/buildtools/buildhelper.xml"/>
+
+</project>
+
