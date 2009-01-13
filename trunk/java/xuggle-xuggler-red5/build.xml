@@ -14,7 +14,7 @@
        revisions in that library's "configure.ac" file, and
        regenerate the build scripts -->
   <property name="library.version.major" value="1"/>
-  <property name="library.version.minor" value="15"/>
+  <property name="library.version.minor" value="16"/>
 
   <!-- And bring in the standard build rules -->
   <import file="mk/buildtools/buildhelper.xml"/>
