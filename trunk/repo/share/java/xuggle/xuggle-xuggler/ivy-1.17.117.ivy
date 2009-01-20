@@ -1,5 +1,5 @@
 <ivy-module version="1.0">
-  <info organisation="xuggle" module="xuggler" revision="1.17.109" status="integration" publication="20090119123129"/>
+  <info organisation="xuggle" module="xuggler" revision="1.17.117" status="integration" publication="20090119180453"/>
   <configurations>
     <conf name="default"/>
     <conf name="test" extends="default" description="Unit testing dependencies"/>
