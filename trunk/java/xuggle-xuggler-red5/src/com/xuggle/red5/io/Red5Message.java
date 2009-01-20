@@ -257,6 +257,9 @@ public class Red5Message
           throw new IllegalArgumentException("cannot pass empty audio data for audio");
         data.rewind();
         dataSize = data.remaining();
+        if (dataSize == 0)
+          throw new IllegalArgumentException("cannot pass empty audio data");
+        
         byte firstByte = data.get(0);
         byte soundFormat = (byte)((firstByte>>4) & 0x0F);
         switch (soundFormat)
