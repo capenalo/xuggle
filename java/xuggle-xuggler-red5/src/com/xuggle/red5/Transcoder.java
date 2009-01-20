@@ -586,14 +586,24 @@ public class Transcoder implements Runnable
               if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_AUDIO && mAudioStreamId == -1)
               {
                 log.debug("found audio stream: {} in {}", i, mInputURL);
-                audioCoder = coder;
-                mAudioStreamId = i;
+                if (coder.getCodec() != null)
+                {
+                  audioCoder = coder;
+                  mAudioStreamId = i;
+                } else {
+                  log.warn("could not find codec for audio stream: {}, {}", i, coder.getCodecID());
+                }
               }
               if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_VIDEO && mVideoStreamId == -1)
               {
                 log.debug("found video stream: {} in {}", i, mInputURL);
-                videoCoder = coder;
-                mVideoStreamId = i;
+                if (coder.getCodec() != null)
+                {
+                  videoCoder = coder;
+                  mVideoStreamId = i;
+                } else {
+                  log.warn("could not find codec for video stream: {}, {}", i, coder.getCodecID());
+                }
               }
             }
           }
@@ -601,6 +611,7 @@ public class Transcoder implements Runnable
       }
       if (mAudioStreamId != -1 && mInAudioCoder == null)
       {
+        
         log.debug("opening input audio coder; codec id: {}; actual codec: {}; sample rate: {}; channels: {}",
             new Object[]{
             audioCoder.getCodecID(),
