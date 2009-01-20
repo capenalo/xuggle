@@ -1,10 +1,10 @@
 This file contains the version of the latest packaged build, plus
 all the SVN dependencies needed to recreate the package.
 
-Xuggle Version: 1.17.107.RC3
+Xuggle Version: 1.17.117.RC3
 
 - Xuggle Versions
-xuggle: http://xuggle.googlecode.com/svn/trunk: 107
+xuggle: http://xuggle.googlecode.com/svn/trunk: 117
 
 - Dependencies
 cxxtest: http://theyard.googlecode.com/svn/theyard/code/trunk/share/gnu/cxxtest/cxxtest-3.10.1 : 170
