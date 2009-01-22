@@ -224,8 +224,8 @@ public class VideoTranscoderDemo
     outputStreamInfo.setHasVideo(true);
     // Unfortunately the Trans-coder needs to know the width and height
     // you want to output as; even if you don't know yet.
-    outputStreamInfo.setVideoHeight(320);
-    outputStreamInfo.setVideoWidth(240);
+    outputStreamInfo.setVideoWidth(320);
+    outputStreamInfo.setVideoHeight(240);
     outputStreamInfo.setVideoBitRate(320000);
     outputStreamInfo.setVideoCodec(ICodec.ID.CODEC_ID_FLV1);
     outputStreamInfo.setVideoGlobalQuality(0);
