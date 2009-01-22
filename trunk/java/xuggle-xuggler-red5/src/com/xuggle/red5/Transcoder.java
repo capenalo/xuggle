@@ -591,7 +591,7 @@ public class Transcoder implements Runnable
                   audioCoder = coder;
                   mAudioStreamId = i;
                 } else {
-                  log.warn("could not find codec for audio stream: {}, {}", i, coder.getCodecID());
+                  log.trace("could not find codec for audio stream: {}, {}", i, coder.getCodecID());
                 }
               }
               if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_VIDEO && mVideoStreamId == -1)
@@ -602,7 +602,7 @@ public class Transcoder implements Runnable
                   videoCoder = coder;
                   mVideoStreamId = i;
                 } else {
-                  log.warn("could not find codec for video stream: {}, {}", i, coder.getCodecID());
+                  log.trace("could not find codec for video stream: {}, {}", i, coder.getCodecID());
                 }
               }
             }
