@@ -26,6 +26,7 @@ import org.red5.server.api.stream.IStreamListener;
 import org.red5.server.api.stream.IStreamPacket;
 import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
+import org.red5.server.net.rtmp.event.Notify;
 import org.red5.server.net.rtmp.event.VideoData;
 import org.slf4j.Logger;
 
@@ -289,6 +290,14 @@ public class Transcoder implements Runnable
                   event.getTimestamp(),
                   mOutputStream.getPublishedName()
               });
+            } else if (event instanceof Notify)
+            {
+              log.debug("  broadcasting patcket type: {}; ts: {}; on stream: {}",
+                  new Object[]{
+                  "NOTIFY",
+                  event.getTimestamp(),
+                  mOutputStream.getPublishedName()
+              });
             } else {            
               log.debug("Writing unknown event to output stream: {}; ts: {}",
                   event, event.getTimestamp());
@@ -414,7 +423,7 @@ public class Transcoder implements Runnable
             point.collect();
           }
         }
-        openInputCoders(); // reopen the input coders if we need to
+        openInputCoders(decodePacket); // reopen the input coders if we need to
         int i = decodePacket.getStreamIndex();
         if (i == mAudioStreamId) {
           log.debug("audio stream id matches: {}", i);
@@ -563,7 +572,7 @@ public class Transcoder implements Runnable
   
   }
 
-  private void openInputCoders()
+  private void openInputCoders(IPacket packet)
   {
     {
       IStreamCoder audioCoder = null;
@@ -582,8 +591,12 @@ public class Transcoder implements Runnable
             IStreamCoder coder = stream.getStreamCoder();
             if (coder != null)
             {
-              log.debug("got stream coder {} in {}", coder, mInputURL);
-              if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_AUDIO && mAudioStreamId == -1)
+              log.debug("got stream coder {} (type: {}) in {}",
+                  new Object[]{coder, coder.getCodecType(), mInputURL});
+              if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_AUDIO // if audio
+                  && mAudioStreamId == -1 // and we haven't already initialized
+                  && packet.getStreamIndex() == i // and this packet is also audio
+                  )
               {
                 log.debug("found audio stream: {} in {}", i, mInputURL);
                 if (coder.getCodec() != null)
@@ -591,10 +604,14 @@ public class Transcoder implements Runnable
                   audioCoder = coder;
                   mAudioStreamId = i;
                 } else {
-                  log.trace("could not find codec for audio stream: {}, {}", i, coder.getCodecID());
+                  log.error("could not find codec for audio stream: {}, {}", i, coder.getCodecID());
+                  throw new RuntimeException("Could not find codec for audio stream");
                 }
               }
-              if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_VIDEO && mVideoStreamId == -1)
+              if (coder.getCodecType()==ICodec.Type.CODEC_TYPE_VIDEO // if video
+                  && mVideoStreamId == -1 // and we haven't already initialized
+                  && packet.getStreamIndex() == i // and this packet is also video
+                  )
               {
                 log.debug("found video stream: {} in {}", i, mInputURL);
                 if (coder.getCodec() != null)
@@ -602,7 +619,8 @@ public class Transcoder implements Runnable
                   videoCoder = coder;
                   mVideoStreamId = i;
                 } else {
-                  log.trace("could not find codec for video stream: {}, {}", i, coder.getCodecID());
+                  log.error("could not find codec for video stream: {}, {}", i, coder.getCodecID());
+                  throw new RuntimeException("Could not find codec for video stream");
                 }
               }
             }
