@@ -204,6 +204,12 @@ public class Transcoder implements Runnable
         EtmPoint point = profiler.createPoint(this.getClass().getName()+"#packetReceived");
         try {
 
+          if (aPacket.getData() == null)
+          {
+            log.debug("skipping empty packet with no data");
+            return;
+          }
+          
           if (aPacket instanceof AudioData)
           {
             log.debug("  adding packet type: {}; ts: {}; on stream: {}",
