@@ -1,7 +1,7 @@
 This file contains the version of the latest packaged build, plus
 all the SVN dependencies needed to recreate the package.
 
-Xuggle Utils Version: 1.18.115
+Xuggle Utils Version: 1.18.114
 
 - Hudson Build:
   http://build.xuggle.com/job/xuggle_java_utils_jdk5_i386_ubuntu/62/
