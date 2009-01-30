@@ -1,0 +1,15 @@
+This file contains the version of the latest packaged build, plus
+all the SVN dependencies needed to recreate the package.
+
+Xuggler Red5 Adapter Version: 1.18.139.RC4
+
+- Hudson Build
+  http://build.xuggle.com/job/xuggle_java_xuggler_red5_jdk5_i386_ubuntu/12/
+
+- Dynamic Revisions (From Hudson)
+    * http://xuggle.googlecode.com/svn/trunk/build/java : 137
+    * http://xuggle.googlecode.com/svn/trunk/java/xuggle-xuggler-red5 : 138
+  
+- Static Dependencies
+  none
+
