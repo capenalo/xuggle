@@ -20,6 +20,7 @@
  */
 package com.xuggle.red5;
 
+import org.apache.mina.common.ByteBuffer;
 import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.stream.IBroadcastStream;
 import org.red5.server.api.stream.IStreamListener;
@@ -204,7 +205,10 @@ public class Transcoder implements Runnable
         EtmPoint point = profiler.createPoint(this.getClass().getName()+"#packetReceived");
         try {
 
-          if (aPacket.getData() == null)
+          ByteBuffer buf = aPacket.getData();
+          if (buf != null)
+            buf.rewind();
+          if (buf==null || buf.remaining()==0)
           {
             log.debug("skipping empty packet with no data");
             return;
