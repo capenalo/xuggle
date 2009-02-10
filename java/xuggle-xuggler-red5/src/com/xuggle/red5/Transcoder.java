@@ -752,6 +752,8 @@ public class Transcoder implements Runnable
       try
       {
         mInputStream.removeStreamListener(mInputListener);
+        if (mOutContainer != null)
+          mOutContainer.writeTrailer();
         if (mOutAudioCoder != null)
           mOutAudioCoder.close();
         mOutAudioCoder = null;
@@ -765,10 +767,7 @@ public class Transcoder implements Runnable
           mInVideoCoder.close();
         mInVideoCoder = null;
         if (mOutContainer != null)
-        {
-          mOutContainer.writeTrailer();
           mOutContainer.close();
-        }
         mOutContainer = null;
       }
       finally
