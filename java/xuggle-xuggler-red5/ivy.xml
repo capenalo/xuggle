@@ -7,6 +7,8 @@
   </configurations>
   <publications>
     <artifact name="xuggle-xuggler-red5" type="jar" conf="default" ext="jar"/>
+    <artifact name="audiotranscoder" type="war" conf="default" ext="war"/>
+    <artifact name="videotranscoder" type="war" conf="default" ext="war"/>
   </publications>
   <dependencies defaultconfmapping="*->*">
     <!-- Our internal libraries -->
