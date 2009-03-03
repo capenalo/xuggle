@@ -51,14 +51,14 @@ import etm.core.timer.Java15NanoTimer;
  * </b>
  * </p><p>
 
- * Then publish (you can use the "demos/publisher/publisher.html" application) an audio
+ * Then publish (you can use the "demos/publisher/publisher.html" application) a
  * stream with a unique name (e.g. "my_stream").
  * </p><p>
- * To hear your transcoded audio stream, connect to the same application and then playback
+ * To see your modified stream, connect to the same application and then playback
  * a stream that has the same unique name, but with "xuggle_" appended to it (e.g. "xuggle_my_stream").
  * </p><p>
  * You should hear the audio you are broadcasting and see the video you are broadcasting,
- * just re-encoded at the new parameters.  Please
+ * just modified and re-encoded with the new parameters.  Please
  * note that while you will hear a latency in this audio, approximately 3-msec is added by our transcoder --
  * the rest is coming from your network, from red5, and from the fact that (probably) you've set your
  * buffer time on your flash NetStream object to 2 seconds.  To see exactly how fast transcoding is,
@@ -81,7 +81,7 @@ public class VideoTranscoderDemoAdapter extends MultiThreadedApplicationAdapter
   {
     log.debug("Demo has started.  Be afraid: {}", this.getClass().getName());
 
-    // This forces us to load an AAFFMPEG shared library.  It's only
+    // This forces us to load the Xuggler shared library.  It's only
     // done because if we're debugging C++ from Java (please don't ask)
     // this allows a breakpoint
     IContainer.make();

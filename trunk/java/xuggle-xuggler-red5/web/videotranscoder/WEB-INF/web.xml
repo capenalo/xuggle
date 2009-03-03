@@ -6,7 +6,7 @@
 
   <context-param>
     <param-name>webAppRootKey</param-name>
-    <param-value>/video</param-value>
+    <param-value>/videotranscoder</param-value>
   </context-param>
 
   <listener>
