@@ -382,7 +382,7 @@ public class Transcoder implements Runnable
       openContainer();
       transcode();
     }
-    catch (RuntimeException e)
+    catch (Throwable e)
     {
       log.error("uncaught exception: {}", e);
     }
