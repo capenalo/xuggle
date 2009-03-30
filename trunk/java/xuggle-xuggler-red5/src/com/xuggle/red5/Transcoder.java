@@ -384,7 +384,8 @@ public class Transcoder implements Runnable
     }
     catch (Throwable e)
     {
-      log.error("uncaught exception: {}", e);
+      log.error("uncaught exception: " + e.getMessage());
+      e.printStackTrace();
     }
     finally
     {
