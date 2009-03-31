@@ -1,9 +1,0 @@
-#summary The Official Xuggler Wiki
-
-= Introduction =
-
-This is the start page for the offical Xuggler Wiki
-
-= Details =
-
-And here's some content, some of it *bold*, and some in _italics!_
