@@ -1,5 +1,5 @@
 <ivy-module version="1.0">
-  <info organisation="xuggle" module="xuggle-red5" />
+  <info organisation="xuggle" module="xuggle-xuggler-red5" />
   <configurations>
     <conf name="default"/>
     <conf name="test" extends="default" description="Unit testing dependencies"/>
