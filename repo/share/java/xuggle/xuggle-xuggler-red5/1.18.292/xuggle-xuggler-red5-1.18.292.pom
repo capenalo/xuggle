@@ -20,48 +20,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>xuggle</groupId>
-      <artifactId>xuggle-xuggler</artifactId>
-      <version>latest.integration</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>red5</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.5.6</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>red5</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>0.9.14</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>red5</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>0.9.14</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>spring</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>2.5.6</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>mina</groupId>
-      <artifactId>mina-core</artifactId>
-      <version>1.1.7</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>jetm</groupId>
       <artifactId>jetm</artifactId>
       <version>1.2.2</version>
