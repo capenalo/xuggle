@@ -29,7 +29,7 @@ package com.xuggle.utils.event;
  *
  */
 
-public interface IEventGenerator
+public interface IEventHandlerRegistrable
 {
   /**
    * Adds an event handler for the given eventClass (and
@@ -59,7 +59,9 @@ public interface IEventGenerator
    * @param handler The handler to call if an appropriate event is being
    *   dispatched by the dispatcher.
    */
-  void addEventHandler(int priority, Class<? extends IEvent> eventClass, IEventHandler handler);
+  void addEventHandler(int priority,
+      Class<? extends IEvent> eventClass,
+      IEventHandler handler);
 
   /**
    * Removes a previously registered event class and event handler
@@ -71,7 +73,9 @@ public interface IEventGenerator
    *   eventClass and handler is not currently registered with this
    *   dispatcher.
    */
-  void removeEventHandler(int priority, Class<? extends IEvent> eventClass, IEventHandler handler)
+  void removeEventHandler(int priority,
+      Class<? extends IEvent> eventClass,
+      IEventHandler handler)
   throws IndexOutOfBoundsException;
 
 }

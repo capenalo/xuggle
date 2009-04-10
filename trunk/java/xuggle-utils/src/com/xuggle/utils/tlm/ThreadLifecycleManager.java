@@ -27,6 +27,7 @@ import com.xuggle.utils.event.Event;
 import com.xuggle.utils.event.IAsynchronousEventDispatcher;
 import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
+import com.xuggle.utils.event.IEventHandlerRegistrable;
 import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.sm.StateMachine;
 
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * An implementation of {@link IThreadLifecycleManager} that uses a {@link StateMachine} to manage the state.
  */
 public class ThreadLifecycleManager extends StateMachine
-  implements IEventDispatcher, IThreadLifecycleManager
+  implements IEventHandlerRegistrable, IThreadLifecycleManager, IEventHandler
 {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -243,7 +244,6 @@ public class ThreadLifecycleManager extends StateMachine
     return (ThreadState) super.getState();
   }
 
-  @Override
   public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
   {
     boolean result = false;

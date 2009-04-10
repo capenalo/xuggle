@@ -24,6 +24,7 @@ package com.xuggle.utils.sm;
 import com.xuggle.test_utils.NameAwareTestClassRunner;
 import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
+import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.sm.StateMachine;
 
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ import org.junit.runner.RunWith;
  */
 
 @RunWith(NameAwareTestClassRunner.class)
-class DoorStateMachine extends StateMachine implements IDoorControl
+class DoorStateMachine extends StateMachine implements IDoorControl, IEventHandler
 {
     static Logger log = LoggerFactory.getLogger(DoorStateMachine.class);
 
