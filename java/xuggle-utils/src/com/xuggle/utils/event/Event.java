@@ -23,10 +23,10 @@ package com.xuggle.utils.event;
 /**
  * A base implementation of an Event.  Can be handy to extend from.
  */
-public class Event implements IEvent
+public abstract class Event implements IEvent
 {
 
-  protected Object mSource;
+  private final Object mSource;
 
   public Event(Object aSource)
   {

@@ -18,37 +18,25 @@
  * with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package com.xuggle.utils.event;
-import static junit.framework.Assert.assertTrue;
 
+/**
+ * If you implement this interface, then an event dispatcher will
+ * auto-handle this event when it comes time to dispatch.  This is
+ * a handy way to register an event but not worry about having a
+ * a listener.
+ * 
+ * <p>
+ * 
+ * This handleEvent() gets called before any other handleEvents().
+ * 
+ * </p>
+ * 
+ * @author aclarke
+ *
+ */
 
-import com.xuggle.test_utils.NameAwareTestClassRunner;
-import com.xuggle.utils.event.Event;
-
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-@RunWith(NameAwareTestClassRunner.class)
-public class EventTest
+public interface ISelfHandlingEvent extends IEvent, IEventHandler
 {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-  private String mTestName = null;
-  
-  @Before
-  public void setUp()
-  {
-    mTestName = NameAwareTestClassRunner.getTestMethodName();
-    log.debug("Running test: {}", mTestName);
-  }
-
-  @Test
-  public void testCreateEvent()
-  {
-    Event event = new Event(this){};
-    assertTrue(event.getSource() == this);
-  }
 }
