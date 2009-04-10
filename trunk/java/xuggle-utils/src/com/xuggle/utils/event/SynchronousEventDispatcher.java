@@ -33,18 +33,26 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * A synchronous implementation of {@link IEventDispatcher}.
+ * A synchronous implementation of {@link IEventDispatcher}.  This
+ * implementation is not thread safe; i.e. if multiple threads try
+ * dispatching at the same time, correctness is not guaranteed.
+ * 
  * <p>
+ * 
  * This method will guarantee that another event will not be dispatched
  * until all handlers for the current event being dispatched have been called
  * and returned.
+ * 
  * </p>
  * <p>
+ * 
  * This means that, even if a handler causes another event to be dispatched,
  * the new event will be queued until the current handler completely
  * unwinds.
+ * 
  * </p> 
  */
+
 public class SynchronousEventDispatcher implements IEventDispatcher
 {
 
@@ -55,6 +63,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    *      A Map (because it can be sparse) of Priority to a list of Event Handlers
    *        A list of event Handlers
    */
+
   private Map<String, SortedMap<Integer, List<IEventHandler>>> mHandlers;
   
   private long mNumNestedEventDispatches;
@@ -193,7 +202,12 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           internalEvent.handleEvent(this, internalEvent);
           continue;
         }
-        
+        if (event instanceof ISelfHandlingEvent)
+        {
+          ISelfHandlingEvent selfHandlingEvent = (ISelfHandlingEvent) event;
+          if (selfHandlingEvent.handleEvent(this, selfHandlingEvent))
+            continue;
+        }
         // find our handler.
         String className = event.getClass().getName();
         if (className == null)

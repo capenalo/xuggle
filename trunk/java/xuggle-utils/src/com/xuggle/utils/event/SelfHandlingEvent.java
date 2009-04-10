@@ -18,37 +18,26 @@
  * with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package com.xuggle.utils.event;
-import static junit.framework.Assert.assertTrue;
 
-
-import com.xuggle.test_utils.NameAwareTestClassRunner;
-import com.xuggle.utils.event.Event;
-
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-@RunWith(NameAwareTestClassRunner.class)
-public class EventTest
+/**
+ * An abstract implementation of a {@link ISelfHandlingEvent}.
+ * 
+ * @author aclarke
+ *
+ */
+public abstract class SelfHandlingEvent extends Event implements ISelfHandlingEvent
 {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  private String mTestName = null;
-  
-  @Before
-  public void setUp()
+  /**
+   * {@inheritDoc}
+   */
+  public SelfHandlingEvent(Object aSource)
   {
-    mTestName = NameAwareTestClassRunner.getTestMethodName();
-    log.debug("Running test: {}", mTestName);
+    super(aSource);
   }
 
-  @Test
-  public void testCreateEvent()
-  {
-    Event event = new Event(this){};
-    assertTrue(event.getSource() == this);
-  }
+  public abstract boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent);
+
 }

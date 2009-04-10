@@ -183,6 +183,7 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
             }
             catch(InterruptedException e)
             {
+              event = new EventDispatcherAbortEvent(this);
             }
           }
         }
