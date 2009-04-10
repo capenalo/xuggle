@@ -26,6 +26,7 @@ import com.xuggle.utils.event.EventDispatcherAbortEvent;
 import com.xuggle.utils.event.IAsynchronousEventDispatcher;
 import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
+import com.xuggle.utils.event.IEventHandlerRegistrable;
 import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.event.SynchronousEventDispatcher;
 
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * An abstract base class for State Machines to use.
  */
-public abstract class StateMachine implements IEventHandler
+public class StateMachine implements IEventHandlerRegistrable
 {
     /** The logger. */
 
@@ -158,10 +159,6 @@ public abstract class StateMachine implements IEventHandler
       setState(initialState);
     }
 
-    /** {@inheritDoc} */
-
-    public abstract boolean handleEvent(IEventDispatcher dispatcher, IEvent event);
-
     /**
      * This event is fired whenever a state machine transitions from one state to another.
      */
@@ -205,5 +202,18 @@ public abstract class StateMachine implements IEventHandler
         {
           return to;
         }
+    }
+
+    public void addEventHandler(int priority,
+        Class<? extends IEvent> eventClass, IEventHandler handler)
+    {
+      getEventDispatcher().addEventHandler(priority, eventClass, handler);
+    }
+
+    public void removeEventHandler(int priority,
+        Class<? extends IEvent> eventClass, IEventHandler handler)
+        throws IndexOutOfBoundsException
+    {
+      getEventDispatcher().removeEventHandler(priority, eventClass, handler);
     }
 }

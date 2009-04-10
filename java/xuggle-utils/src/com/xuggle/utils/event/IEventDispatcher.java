@@ -49,7 +49,7 @@ package com.xuggle.utils.event;
  * @author aclarke
  *
  */
-public interface IEventDispatcher extends IEventGenerator {
+public interface IEventDispatcher extends IEventHandlerRegistrable {
 
   /**
    * Takes the given event, and passes
