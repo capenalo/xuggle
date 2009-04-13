@@ -23,7 +23,6 @@ package com.xuggle.utils.event;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -31,6 +30,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A synchronous implementation of {@link IEventDispatcher}.  This
@@ -64,10 +65,10 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    *        A list of event Handlers
    */
 
-  private Map<String, SortedMap<Integer, List<IEventHandler>>> mHandlers;
+  private final Map<String, SortedMap<Integer, List<IEventHandler>>> mHandlers;
   
-  private long mNumNestedEventDispatches;
-  private Queue<IEvent> mPendingEventDispatches;
+  private final AtomicLong mNumNestedEventDispatches;
+  private final Queue<IEvent> mPendingEventDispatches;
 
   private abstract class EventHandlerEvent implements IEvent, IEventHandler
   {
@@ -144,9 +145,9 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   }
   public SynchronousEventDispatcher()
   {
-    mNumNestedEventDispatches = 0;
+    mNumNestedEventDispatches = new AtomicLong(0);
+    mPendingEventDispatches = new ConcurrentLinkedQueue<IEvent>();
     mHandlers = new HashMap<String, SortedMap<Integer,List<IEventHandler>>>();
-    mPendingEventDispatches = new LinkedList<IEvent>();
   }
   
   private void dispatchedAddEventHandler(int priority,
@@ -181,7 +182,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
 
   public void dispatchEvent(IEvent event)
   {
-    ++mNumNestedEventDispatches;
+    long dispatcherNum = mNumNestedEventDispatches.incrementAndGet();
     try
     {
       if (event == null)
@@ -190,10 +191,10 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       mPendingEventDispatches.add(event);
       // don't process a dispatch if nested within a dispatchEvent() call;
       // wait for the stack to unwind, and then process it.
-      while(mNumNestedEventDispatches == 1 && mPendingEventDispatches.size() > 0)
+      while(dispatcherNum == 1
+          && (event = mPendingEventDispatches.poll()) != null)
       {
         boolean eventHandled = false;
-        event = mPendingEventDispatches.poll();
         
         // if this is an internal event, dispatch is now (that the stack is unwound)
         if (event instanceof EventHandlerEvent)
@@ -243,7 +244,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     }
     finally
     {
-      --mNumNestedEventDispatches;
+      mNumNestedEventDispatches.decrementAndGet();
     }
   }
 

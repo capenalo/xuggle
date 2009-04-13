@@ -46,6 +46,28 @@ public final class TimeValue implements Comparable<TimeValue>
     mValue = aValue;
     mUnit = aUnit;
   }
+ 
+  /**
+   * Get current time, as returned by {@link System#nanoTime()}.
+   * 
+   * @return current time
+   */
+  
+  public static TimeValue nanoNow()
+  {
+    return new TimeValue(System.nanoTime(), TimeUnit.NANOSECONDS);
+  }
+  
+  /**
+   * Get current time, as returned by {@link System#currentTimeMillis()}.
+   * 
+   * @return current time
+   */
+  
+  public static TimeValue now()
+  {
+    return new TimeValue(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+  }
   
   public TimeValue(TimeValue aSrc)
   {
