@@ -100,17 +100,33 @@ public class StateMachine implements IEventHandlerRegistrable
     }
 
     /** Sets the state of this state machine.  The transition will occur
-     * only after the state machine achvies quiescence.
+     * only after the state machine achieves quiescence.
      *
      * @param target the target state to transition to
      */
 
-    protected void setState(IState target)
+    public void setState(IState target)
     {
       IState from = state;
       state = target;
       log.debug("State change: " + from + " -> " + state);
-      eventDispatcher.dispatchEvent(new TransitionEvent(this, from, target));
+      IEvent event = newTransitionEvent(this, from, target);
+      eventDispatcher.dispatchEvent(event);
+    }
+
+    /**
+     * Override in child classes if you want to provide your own transition
+     * event.
+     * 
+     * @param stateMachine The source state machine
+     * @param from The state we're transitioning from
+     * @param target The state we're transitioning to
+     * @return The new event
+     */
+    protected IEvent newTransitionEvent(StateMachine stateMachine,
+        IState from, IState target)
+    {
+      return new TransitionEvent(stateMachine, from, target);
     }
 
     /**
@@ -162,7 +178,7 @@ public class StateMachine implements IEventHandlerRegistrable
     /**
      * This event is fired whenever a state machine transitions from one state to another.
      */
-    public class TransitionEvent extends Event
+    public static class TransitionEvent extends Event
     {
         /** Target state of this transition event. */
 
