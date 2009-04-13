@@ -1,12 +1,12 @@
 <ivy-module version="1.0">
-  <info organisation="trebor.org" module="trebor-util" revision="1.0.7" status="integration" publication="20090410171208"/>
+  <info organisation="trebor.org" module="util" revision="1.0.7" status="integration" publication="20090413103449"/>
   <configurations>
     <conf name="default"/>
     
     
   </configurations>
   <publications>
-    <artifact name="trebor-util" type="jar" conf="default" ext="jar"/>
+    <artifact name="util" type="jar" conf="default" ext="jar"/>
   </publications>
   <dependencies defaultconfmapping="*->*">
 

@@ -9,7 +9,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>trebor.org</groupId>
-  <artifactId>trebor-util</artifactId>
+  <artifactId>util</artifactId>
   <packaging>jar</packaging>
   <version>1.0.7</version>
 </project>
