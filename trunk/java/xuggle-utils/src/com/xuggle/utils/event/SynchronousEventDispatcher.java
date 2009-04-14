@@ -23,6 +23,7 @@ package com.xuggle.utils.event;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -32,6 +33,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A synchronous implementation of {@link IEventDispatcher}.  This
@@ -56,6 +60,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class SynchronousEventDispatcher implements IEventDispatcher
 {
+  final private Logger log = LoggerFactory.getLogger(this.getClass());
 
   /**
    * Here's the data structure type
@@ -70,12 +75,12 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   private final AtomicLong mNumNestedEventDispatches;
   private final Queue<IEvent> mPendingEventDispatches;
 
-  private abstract class EventHandlerEvent implements IEvent, IEventHandler
+  private abstract class EventHandlerEvent extends SelfHandlingEvent
+  
   {
     private final int mPriority;
     private final Class<? extends IEvent> mEventClass;
     private final IEventHandler mHandler;
-    private final SynchronousEventDispatcher mSource;
     
     public EventHandlerEvent(
         SynchronousEventDispatcher dispatcher,
@@ -83,16 +88,17 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         Class<? extends IEvent> eventClass,
         IEventHandler handler)
     {
+      super(dispatcher);
       mPriority = priority;
       mEventClass = eventClass;
       mHandler = handler;
-      mSource = dispatcher;
+      log.trace("<init>");
     }
     
     
     public SynchronousEventDispatcher getSource()
     {
-      return mSource;
+      return (SynchronousEventDispatcher)super.getSource();
     }
 
     public IEventHandler getHandler()
@@ -188,6 +194,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       if (event == null)
         throw new IllegalArgumentException("cannot dispatch null event");
       
+      //log.debug("dispatching event: {}", event);
       mPendingEventDispatches.add(event);
       // don't process a dispatch if nested within a dispatchEvent() call;
       // wait for the stack to unwind, and then process it.
@@ -195,51 +202,43 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           && (event = mPendingEventDispatches.poll()) != null)
       {
         boolean eventHandled = false;
+        Queue<IEventHandler> handlers = new LinkedList<IEventHandler>();
         
-        // if this is an internal event, dispatch is now (that the stack is unwound)
-        if (event instanceof EventHandlerEvent)
-        {
-          EventHandlerEvent internalEvent = (EventHandlerEvent) event;
-          internalEvent.handleEvent(this, internalEvent);
-          continue;
-        }
+        // First, determine all the valid handlers
+        
+        // self handlers ARE ALWAYS called first
         if (event instanceof ISelfHandlingEvent)
-        {
-          ISelfHandlingEvent selfHandlingEvent = (ISelfHandlingEvent) event;
-          if (selfHandlingEvent.handleEvent(this, selfHandlingEvent))
-            continue;
-        }
-        // find our handler.
+          handlers.add((IEventHandler)event);
+                
+        // find our registered handlers.
         String className = event.getClass().getName();
         if (className == null)
           throw new IllegalArgumentException("cannot get class name for event");
 
         Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
-        if (priorities == null)
+        if (priorities != null)
         {
-          // nothing to dispatch as there are no listeners; drop it.
-          eventHandled = true;
-        } else {
           Set<Integer> priorityKeys = priorities.keySet();
           Iterator<Integer> orderedKeys = priorityKeys.iterator();
-          while(!eventHandled && orderedKeys.hasNext())
+          while(orderedKeys.hasNext())
           {
             Integer priority = orderedKeys.next();
-            List<IEventHandler> handlers = priorities.get(priority);
-            if (handlers != null)
+            List<IEventHandler> priHandlers = priorities.get(priority);
+            if (priHandlers != null)
             {
-              for(IEventHandler handler: handlers)
-              {
-                eventHandled = handler.handleEvent(this, event);
-                if (eventHandled == true)
-                {
-                  // the event is fully handled; stop propagating
-                  break;
-                }
-              }
+              handlers.addAll(priHandlers);
             }
           }
         }
+        //log.debug("Handling event: {} with {} handlers", event, handlers.size());
+        Iterator<IEventHandler> handlersIter = handlers.iterator();
+        while(!eventHandled && handlersIter.hasNext())
+        {
+          IEventHandler handler = handlersIter.next();
+          //log.debug("Handling event: {} with handler: {}", event, handler);
+          eventHandled = handler.handleEvent(this, event);
+        }
+        //log.debug("Handling event: {} done", event);
       }
     }
     finally
