@@ -75,88 +75,15 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   private final AtomicLong mNumNestedEventDispatches;
   private final Queue<IEvent> mPendingEventDispatches;
 
-  private abstract class EventHandlerEvent extends SelfHandlingEvent
-  
-  {
-    private final int mPriority;
-    private final Class<? extends IEvent> mEventClass;
-    private final IEventHandler mHandler;
-    
-    public EventHandlerEvent(
-        SynchronousEventDispatcher dispatcher,
-        int priority,
-        Class<? extends IEvent> eventClass,
-        IEventHandler handler)
-    {
-      super(dispatcher);
-      mPriority = priority;
-      mEventClass = eventClass;
-      mHandler = handler;
-      log.trace("<init>");
-    }
-    
-    
-    public SynchronousEventDispatcher getSource()
-    {
-      return (SynchronousEventDispatcher)super.getSource();
-    }
-
-    public IEventHandler getHandler()
-    {
-      return mHandler;
-    }
-
-    public Class<? extends IEvent> getEventClass()
-    {
-      return mEventClass;
-    }
-
-    public int getPriority()
-    {
-      return mPriority;
-    }
-
-    
-    public abstract boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent);
-  }
-  private class AddEventHandlerEvent extends EventHandlerEvent
-  {
-    public AddEventHandlerEvent(SynchronousEventDispatcher aDispatcher, int aPriority,
-        Class<? extends IEvent> aEventClass, IEventHandler aHandler)
-    {
-      super(aDispatcher, aPriority, aEventClass, aHandler);
-    }
-
-    
-    public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
-    {
-      getSource().dispatchedAddEventHandler(getPriority(), getEventClass(), getHandler());
-      return false;
-    }    
-  }
-  private class RemoveEventHandlerEvent extends EventHandlerEvent
-  {
-    public RemoveEventHandlerEvent(SynchronousEventDispatcher aDispatcher, int aPriority,
-        Class<? extends IEvent> aEventClass, IEventHandler aHandler)
-    {
-      super(aDispatcher, aPriority, aEventClass, aHandler);
-    }
-
-    
-    public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
-    {
-      getSource().dispatchedRemoveEventHandler(getPriority(), getEventClass(), getHandler());
-      return false;
-    } 
-  }
   public SynchronousEventDispatcher()
   {
     mNumNestedEventDispatches = new AtomicLong(0);
     mPendingEventDispatches = new ConcurrentLinkedQueue<IEvent>();
     mHandlers = new HashMap<String, SortedMap<Integer,List<IEventHandler>>>();
+    log.trace("<init>");
   }
   
-  private void dispatchedAddEventHandler(int priority,
+  public void addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler handler)
   {
@@ -168,22 +95,25 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     String className = eventClass.getName();
     if (className == null || className.length() <= 0)
       throw new IllegalArgumentException("cannot get name of class");
-    
-    SortedMap<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
-    if (priorities == null)
+   
+    synchronized(mHandlers)
     {
-      priorities = new TreeMap<Integer, List<IEventHandler>>();
-      mHandlers.put(className, priorities);
+      SortedMap<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
+      if (priorities == null)
+      {
+        priorities = new TreeMap<Integer, List<IEventHandler>>();
+        mHandlers.put(className, priorities);
+      }
+
+      List<IEventHandler> handlers = priorities.get(priority);
+      if (handlers == null)
+      {
+        handlers = new ArrayList<IEventHandler>();
+        priorities.put(priority, handlers);
+      }
+      handlers.add(handler);
+      // and we're done.
     }
-    
-    List<IEventHandler> handlers = priorities.get(priority);
-    if (handlers == null)
-    {
-      handlers = new ArrayList<IEventHandler>();
-      priorities.put(priority, handlers);
-    }
-    handlers.add(handler);
-    // and we're done.
   }
 
   public void dispatchEvent(IEvent event)
@@ -206,27 +136,30 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         
         // First, determine all the valid handlers
         
-        // self handlers ARE ALWAYS called first
-        if (event instanceof ISelfHandlingEvent)
-          handlers.add((IEventHandler)event);
-                
         // find our registered handlers.
         String className = event.getClass().getName();
         if (className == null)
           throw new IllegalArgumentException("cannot get class name for event");
 
-        Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
-        if (priorities != null)
+        // self handlers ARE ALWAYS called first
+        if (event instanceof ISelfHandlingEvent)
+          handlers.add((IEventHandler)event);
+
+        synchronized(mHandlers)
         {
-          Set<Integer> priorityKeys = priorities.keySet();
-          Iterator<Integer> orderedKeys = priorityKeys.iterator();
-          while(orderedKeys.hasNext())
+          Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
+          if (priorities != null)
           {
-            Integer priority = orderedKeys.next();
-            List<IEventHandler> priHandlers = priorities.get(priority);
-            if (priHandlers != null)
+            Set<Integer> priorityKeys = priorities.keySet();
+            Iterator<Integer> orderedKeys = priorityKeys.iterator();
+            while(orderedKeys.hasNext())
             {
-              handlers.addAll(priHandlers);
+              Integer priority = orderedKeys.next();
+              List<IEventHandler> priHandlers = priorities.get(priority);
+              if (priHandlers != null)
+              {
+                handlers.addAll(priHandlers);
+              }
             }
           }
         }
@@ -247,7 +180,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     }
   }
 
-  private void dispatchedRemoveEventHandler(int priority,
+  public void removeEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler handler) throws IndexOutOfBoundsException
   {
@@ -259,62 +192,52 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     String className = eventClass.getName();
     if (className == null || className.length() <= 0)
       throw new IllegalArgumentException("cannot get name of class");
-    
-    Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
-    if (priorities == null)
+    synchronized(mHandlers)
     {
-      // could not find entry in list
-      throw new IndexOutOfBoundsException();
-    }
-    
-    List<IEventHandler> handlers = priorities.get(priority);
-    if (handlers == null)
-    {
-      // could not find entry in list
-      throw new IndexOutOfBoundsException();
-    }
-
-    ListIterator<IEventHandler> iter = handlers.listIterator();
-    // Walk through and remove all copies of this handler.
-    // someone may have registered multiple copies of the same
-    // handler, and we nuke them all
-    int handlersNuked = 0;
-    while(iter.hasNext())
-    {
-      IEventHandler registeredHandler = iter.next();
-      if (registeredHandler == handler)
+      Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
+      if (priorities == null)
       {
-        iter.remove();
-        ++handlersNuked;
+        // could not find entry in list
+        throw new IndexOutOfBoundsException();
+      }
+
+      List<IEventHandler> handlers = priorities.get(priority);
+      if (handlers == null)
+      {
+        // could not find entry in list
+        throw new IndexOutOfBoundsException();
+      }
+
+      ListIterator<IEventHandler> iter = handlers.listIterator();
+      // Walk through and remove all copies of this handler.
+      // someone may have registered multiple copies of the same
+      // handler, and we nuke them all
+      int handlersNuked = 0;
+      while(iter.hasNext())
+      {
+        IEventHandler registeredHandler = iter.next();
+        if (registeredHandler == handler)
+        {
+          iter.remove();
+          ++handlersNuked;
+        }
+      }
+      if (handlersNuked == 0)
+      {
+        // could not find entry in list
+        throw new IndexOutOfBoundsException();      
+      }
+      if (handlers.size() ==0)
+      {
+        // All handlers were removed for this priority; clean up.
+        priorities.remove(priority);
+      }
+      if (priorities.size() == 0)
+      {
+        // all priorities were removed for this class; clean up
+        mHandlers.remove(className);
       }
     }
-    if (handlersNuked == 0)
-    {
-      // could not find entry in list
-      throw new IndexOutOfBoundsException();      
-    }
-    if (handlers.size() ==0)
-    {
-      // All handlers were removed for this priority; clean up.
-      priorities.remove(priority);
-    }
-    if (priorities.size() == 0)
-    {
-      // all priorities were removed for this class; clean up
-      mHandlers.remove(className);
-    }
   }
 
-  public void addEventHandler(int aPriority,
-      Class<? extends IEvent> aEventClass, IEventHandler aHandler)
-  {
-    this.dispatchEvent(new AddEventHandlerEvent(this, aPriority, aEventClass, aHandler));
-  }
-
-  public void removeEventHandler(int aPriority,
-      Class<? extends IEvent> aEventClass, IEventHandler aHandler)
-      throws IndexOutOfBoundsException
-  {
-    this.dispatchEvent(new RemoveEventHandlerEvent(this, aPriority, aEventClass, aHandler));
-  }
 }

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 import com.xuggle.test_utils.NameAwareTestClassRunner;
+import com.xuggle.utils.Mutable;
 import com.xuggle.utils.event.Event;
 import com.xuggle.utils.event.EventDispatcherStopEvent;
 import com.xuggle.utils.event.IEvent;
@@ -348,5 +349,39 @@ public class SynchronousEventDispatcherTest
     assertEquals("should be handled once", 1, numCalls.get());
     dispatcher.dispatchEvent(new TestEvent(this));
     assertEquals("should not be handled again after first handler removes", 1, numCalls.get());
+  }
+  
+  @Test
+  public void testAddEventHandlersHappenImmediately()
+  {
+    final IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+    final Mutable<Boolean> gotFirstEvent = new Mutable<Boolean>(false);
+    final Mutable<Boolean> gotSecondEvent = new Mutable<Boolean>(false);
+    
+    final ISelfHandlingEvent firstEvent = new SelfHandlingEvent(this){
+      @Override
+      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+      {
+        final IEvent secondEvent = new Event(this){};
+        // register an event handler; in old code this would not fire
+        // until this handleEvent has fully unwound
+        // dispatch the second event
+        dispatcher.dispatchEvent(secondEvent);
+        dispatcher.addEventHandler(0, secondEvent.getClass(), 
+            new IEventHandler(){
+              public boolean handleEvent(IEventDispatcher dispatcher,
+                  IEvent event)
+              {
+                assertTrue(gotFirstEvent.get());
+                gotSecondEvent.set(true);
+                dispatcher.removeEventHandler(0, event.getClass(), this);
+                return false;
+              }});
+        gotFirstEvent.set(true);
+        return false;
+      }};
+      dispatcher.dispatchEvent(firstEvent);
+      assertTrue(gotFirstEvent.get());
+      assertTrue(gotSecondEvent.get());
   }
 }
