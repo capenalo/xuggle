@@ -40,6 +40,7 @@ implements ISelfHandlingEvent<E>
     super(aSource);
   }
 
-  public abstract boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent);
+  public abstract boolean handleEvent(IEventDispatcher aDispatcher,
+      E aEvent);
 
 }
