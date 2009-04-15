@@ -23,7 +23,6 @@ package com.xuggle.utils.event;
 import static junit.framework.Assert.assertTrue;
 
 
-import com.xuggle.test_utils.NameAwareTestClassRunner;
 import com.xuggle.utils.event.AsynchronousEventDispatcher;
 import com.xuggle.utils.event.Event;
 import com.xuggle.utils.event.EventDispatcherAbortEvent;
@@ -34,24 +33,15 @@ import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
 
 import org.junit.*;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
-@RunWith(NameAwareTestClassRunner.class)
 public class AsynchronousEventDispatcherTest
 {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-  private String mTestName = null;
   private long mNumEventsHandled;
   
   @Before
   public void setUp()
   {
-    mTestName = NameAwareTestClassRunner.getTestMethodName();
-    log.debug("Running test: {}", mTestName);
     mNumEventsHandled = 0;
   }
 
@@ -115,12 +105,11 @@ public class AsynchronousEventDispatcherTest
       public TestEvent() { super(null); }
       public boolean mWasHandled = false;
     };
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<TestEvent> handler = new IEventHandler<TestEvent>()
     {
-      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+      public boolean handleEvent(IEventDispatcher dispatcher, TestEvent event)
       {
-        TestEvent ev = (TestEvent) event;
-        ev.mWasHandled = true;
+        event.mWasHandled = true;
         return true;
       }
     };
@@ -151,7 +140,7 @@ public class AsynchronousEventDispatcherTest
       public TestEvent() { super(null); }
       public int mHandlerNo = -1;
     };
-    IEventHandler handler1 = new IEventHandler()
+    IEventHandler<IEvent> handler1 = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -160,7 +149,7 @@ public class AsynchronousEventDispatcherTest
         return true;
       }
     };
-    IEventHandler handler2 = new IEventHandler()
+    IEventHandler<IEvent> handler2 = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -193,7 +182,7 @@ public class AsynchronousEventDispatcherTest
     {
       public TestEvent() { super(null); }
     };
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {

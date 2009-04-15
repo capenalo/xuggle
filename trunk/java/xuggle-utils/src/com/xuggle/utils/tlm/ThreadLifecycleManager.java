@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
  * An implementation of {@link IThreadLifecycleManager} that uses a {@link StateMachine} to manage the state.
  */
 public class ThreadLifecycleManager extends StateMachine
-  implements IEventHandlerRegistrable, IThreadLifecycleManager, IEventHandler
+  implements IEventHandlerRegistrable, IThreadLifecycleManager,
+  IEventHandler<IEvent>
 {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -59,7 +60,7 @@ public class ThreadLifecycleManager extends StateMachine
 
   private Throwable mWorkerException = null;
   
-  private abstract class InternalEvent extends Event implements IEventHandler
+  private abstract class InternalEvent extends Event implements IEventHandler<IEvent>
   {
     InternalEvent(IThreadLifecycleManager sm)
     {
@@ -259,13 +260,15 @@ public class ThreadLifecycleManager extends StateMachine
   }
 
   public void addEventHandler(int priority,
-      Class<? extends IEvent> eventClass, IEventHandler handler)
+      Class<? extends IEvent> eventClass,
+      IEventHandler<? extends IEvent> handler)
   {
     this.getEventDispatcher().addEventHandler(priority, eventClass, handler);
   }
 
   public void removeEventHandler(int priority,
-      Class<? extends IEvent> eventClass, IEventHandler handler)
+      Class<? extends IEvent> eventClass,
+      IEventHandler<? extends IEvent> handler)
       throws IndexOutOfBoundsException
   {
     this.getEventDispatcher().removeEventHandler(priority, eventClass, handler);

@@ -124,7 +124,8 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
     return mDispatchThread.isAlive();
   }
 
-  public void addEventHandler(int priority, Class<? extends IEvent> eventClass, IEventHandler handler)
+  public void addEventHandler(int priority, Class<? extends IEvent> eventClass,
+      IEventHandler<? extends IEvent> handler)
   {
     synchronized(this)
     {
@@ -155,7 +156,7 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
 
   public synchronized void removeEventHandler(int priority,
       Class<? extends IEvent> eventClass,
-      IEventHandler handler) throws IndexOutOfBoundsException
+      IEventHandler<? extends IEvent> handler) throws IndexOutOfBoundsException
   {
     synchronized(this)
     {

@@ -33,7 +33,7 @@ public class SelfHandlingEventTest
   @Test
   public final void testSelfHandlingEvent()
   {
-    new SelfHandlingEvent(null)
+    new SelfHandlingEvent<IEvent>(null)
     {
       @Override
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
@@ -41,7 +41,7 @@ public class SelfHandlingEventTest
         return false;
       }
     };
-    new SelfHandlingEvent(this)
+    new SelfHandlingEvent<IEvent>(this)
     {
       @Override
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
@@ -59,7 +59,7 @@ public class SelfHandlingEventTest
       new SynchronousEventDispatcher();
     final Mutable<Boolean> gotHandled = new Mutable<Boolean>(false);
     
-    dispatcher.dispatchEvent(new SelfHandlingEvent(this)
+    dispatcher.dispatchEvent(new SelfHandlingEvent<IEvent>(this)
     {
       @Override
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
@@ -79,7 +79,7 @@ public class SelfHandlingEventTest
       new SynchronousEventDispatcher();
     final Mutable<Integer> numTimesHandled = new Mutable<Integer>(0);
     
-    final IEventHandler handler = new IEventHandler()
+    final IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
       {
@@ -88,7 +88,7 @@ public class SelfHandlingEventTest
       }
       
     };
-    IEvent event = new SelfHandlingEvent(this)
+    IEvent event = new SelfHandlingEvent<IEvent>(this)
     {
       @Override
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
@@ -113,7 +113,7 @@ public class SelfHandlingEventTest
       new SynchronousEventDispatcher();
     final Mutable<Integer> numTimesHandled = new Mutable<Integer>(0);
     
-    final IEventHandler handler = new IEventHandler()
+    final IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
       {
@@ -122,7 +122,7 @@ public class SelfHandlingEventTest
       }
       
     };
-    IEvent event = new SelfHandlingEvent(this)
+    IEvent event = new SelfHandlingEvent<IEvent>(this)
     {
       @Override
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)

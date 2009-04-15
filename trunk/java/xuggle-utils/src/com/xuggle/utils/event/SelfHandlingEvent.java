@@ -27,7 +27,9 @@ package com.xuggle.utils.event;
  * @author aclarke
  *
  */
-public abstract class SelfHandlingEvent extends Event implements ISelfHandlingEvent
+public abstract class SelfHandlingEvent<E extends IEvent>
+extends Event
+implements ISelfHandlingEvent<E>
 {
 
   /**

@@ -35,7 +35,7 @@ package com.xuggle.utils.event;
  * @author aclarke
  *
  */
-public class ForwardingHandler implements IEventHandler
+public class ForwardingHandler implements IEventHandler<IEvent>
 {
   private final IEventDispatcher mDispatcher;
   

@@ -26,7 +26,6 @@ import static org.junit.Assert.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-import com.xuggle.test_utils.NameAwareTestClassRunner;
 import com.xuggle.utils.Mutable;
 import com.xuggle.utils.event.Event;
 import com.xuggle.utils.event.EventDispatcherStopEvent;
@@ -36,24 +35,15 @@ import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.event.SynchronousEventDispatcher;
 
 import org.junit.*;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-
-@RunWith(NameAwareTestClassRunner.class)
 public class SynchronousEventDispatcherTest
 {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  private String mTestName = null;
   private int mNumEventsHandled = 0;
   
   @Before
   public void setUp()
   {
-    mTestName = NameAwareTestClassRunner.getTestMethodName();
-    log.debug("Running test: {}", mTestName);
     mNumEventsHandled = 0;
   }
 
@@ -70,7 +60,7 @@ public class SynchronousEventDispatcherTest
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     assertTrue(dispatcher != null);
 
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -88,7 +78,7 @@ public class SynchronousEventDispatcherTest
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     assertTrue(dispatcher != null);
 
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -108,7 +98,7 @@ public class SynchronousEventDispatcherTest
       public TestEvent() { super(null); }
       public boolean mWasHandled = false;
     };
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -136,7 +126,7 @@ public class SynchronousEventDispatcherTest
       public TestEvent() { super(null); }
       public int mHandlerNo = -1;
     };
-    IEventHandler handler1 = new IEventHandler()
+    IEventHandler<IEvent> handler1 = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -145,7 +135,7 @@ public class SynchronousEventDispatcherTest
         return true;
       }
     };
-    IEventHandler handler2 = new IEventHandler()
+    IEventHandler<IEvent> handler2 = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -186,7 +176,7 @@ public class SynchronousEventDispatcherTest
     class Child extends Parent
     {      
     }
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -217,7 +207,7 @@ public class SynchronousEventDispatcherTest
       public TestEvent() { super(null); }
       public int mNumDispatches = 0;
     };
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -269,10 +259,10 @@ public class SynchronousEventDispatcherTest
         super(source);
       }
     };
-    class TestEventHandler implements IEventHandler
+    class TestEventHandler implements IEventHandler<TestEvent>
     {
       
-      public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
+      public boolean handleEvent(IEventDispatcher aDispatcher, TestEvent aEvent)
       {
         aDispatcher.removeEventHandler(0, TestEvent.class, this);
         return false;
@@ -294,7 +284,7 @@ public class SynchronousEventDispatcherTest
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     assertTrue(dispatcher != null);
 
-    IEventHandler handler = new IEventHandler()
+    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
     {
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -304,7 +294,7 @@ public class SynchronousEventDispatcherTest
     Class<? extends IEvent> clazz = EventDispatcherStopEvent.class;
     dispatcher.addEventHandler(0, clazz, handler);
     // This should fail
-    dispatcher.removeEventHandler(0, clazz, new IEventHandler(){
+    dispatcher.removeEventHandler(0, clazz, new IEventHandler<IEvent>(){
       
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
       {
@@ -328,7 +318,7 @@ public class SynchronousEventDispatcherTest
         super(source);
       }
     };
-    class TestEventHandler implements IEventHandler
+    class TestEventHandler implements IEventHandler<TestEvent>
     {
       AtomicInteger mCount;
       public TestEventHandler(AtomicInteger count)
@@ -336,7 +326,7 @@ public class SynchronousEventDispatcherTest
         mCount = count;
       }
       
-      public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
+      public boolean handleEvent(IEventDispatcher aDispatcher, TestEvent aEvent)
       {
         mCount.incrementAndGet();
         aDispatcher.removeEventHandler(0, TestEvent.class, this);
@@ -350,6 +340,35 @@ public class SynchronousEventDispatcherTest
     dispatcher.dispatchEvent(new TestEvent(this));
     assertEquals("should not be handled again after first handler removes", 1, numCalls.get());
   }
+
+  /**
+   * Tests that if we pass a handler for a class with the wrong
+   * templated type, that a class cast exception will be thrown when
+   * dispatching
+   * 
+   */
+  
+  @Test(expected=ClassCastException.class)
+  public void testAddEventHandlerOfWrongType()
+  {
+    IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+    class TestEvent extends Event
+    {
+      @SuppressWarnings("unused")
+      public TestEvent(Object source) { super(source); }
+    }
+    IEventHandler<TestEvent> wrongHandler = new IEventHandler<TestEvent>(){
+
+      public boolean handleEvent(IEventDispatcher dispatcher, TestEvent event)
+      {
+        // should never get called
+        fail("shouldn't be here");
+        return false;
+      }};
+      IEvent wrongEvent = new Event(this){};
+      dispatcher.addEventHandler(0, wrongEvent.getClass(), wrongHandler);
+      dispatcher.dispatchEvent(wrongEvent);
+  }
   
   @Test
   public void testAddEventHandlersHappenImmediately()
@@ -358,7 +377,8 @@ public class SynchronousEventDispatcherTest
     final Mutable<Boolean> gotFirstEvent = new Mutable<Boolean>(false);
     final Mutable<Boolean> gotSecondEvent = new Mutable<Boolean>(false);
     
-    final ISelfHandlingEvent firstEvent = new SelfHandlingEvent(this){
+    final ISelfHandlingEvent<IEvent> firstEvent =
+      new SelfHandlingEvent<IEvent>(this){
       @Override
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
@@ -368,7 +388,7 @@ public class SynchronousEventDispatcherTest
         // dispatch the second event
         dispatcher.dispatchEvent(secondEvent);
         dispatcher.addEventHandler(0, secondEvent.getClass(), 
-            new IEventHandler(){
+            new IEventHandler<IEvent>(){
               public boolean handleEvent(IEventDispatcher dispatcher,
                   IEvent event)
               {
