@@ -61,7 +61,7 @@ public interface IEventHandlerRegistrable
    */
   void addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
-      IEventHandler handler);
+      IEventHandler<? extends IEvent> handler);
 
   /**
    * Removes a previously registered event class and event handler
@@ -75,7 +75,7 @@ public interface IEventHandlerRegistrable
    */
   void removeEventHandler(int priority,
       Class<? extends IEvent> eventClass,
-      IEventHandler handler)
+      IEventHandler<? extends IEvent> handler)
   throws IndexOutOfBoundsException;
 
 }

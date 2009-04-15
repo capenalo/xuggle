@@ -70,7 +70,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    *        A list of event Handlers
    */
 
-  private final Map<String, SortedMap<Integer, List<IEventHandler>>> mHandlers;
+  private final Map<String, SortedMap<Integer,
+    List<IEventHandler<? extends IEvent>>>> mHandlers;
   
   private final AtomicLong mNumNestedEventDispatches;
   private final Queue<IEvent> mPendingEventDispatches;
@@ -79,13 +80,14 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   {
     mNumNestedEventDispatches = new AtomicLong(0);
     mPendingEventDispatches = new ConcurrentLinkedQueue<IEvent>();
-    mHandlers = new HashMap<String, SortedMap<Integer,List<IEventHandler>>>();
+    mHandlers = new HashMap<String, SortedMap<Integer,
+      List<IEventHandler<? extends IEvent>>>>();
     log.trace("<init>");
   }
   
   public void addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
-      IEventHandler handler)
+      IEventHandler<? extends IEvent> handler)
   {
     if (eventClass == null)
       throw new IllegalArgumentException("cannot pass null class");
@@ -98,17 +100,18 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    
     synchronized(mHandlers)
     {
-      SortedMap<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
+      SortedMap<Integer, List<IEventHandler<? extends IEvent>>> priorities
+        = mHandlers.get(className);
       if (priorities == null)
       {
-        priorities = new TreeMap<Integer, List<IEventHandler>>();
+        priorities = new TreeMap<Integer, List<IEventHandler<? extends IEvent>>>();
         mHandlers.put(className, priorities);
       }
 
-      List<IEventHandler> handlers = priorities.get(priority);
+      List<IEventHandler<? extends IEvent>> handlers = priorities.get(priority);
       if (handlers == null)
       {
-        handlers = new ArrayList<IEventHandler>();
+        handlers = new ArrayList<IEventHandler<? extends IEvent>>();
         priorities.put(priority, handlers);
       }
       handlers.add(handler);
@@ -116,6 +119,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     }
   }
 
+  @SuppressWarnings("unchecked")
   public void dispatchEvent(IEvent event)
   {
     long dispatcherNum = mNumNestedEventDispatches.incrementAndGet();
@@ -132,7 +136,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           && (event = mPendingEventDispatches.poll()) != null)
       {
         boolean eventHandled = false;
-        Queue<IEventHandler> handlers = new LinkedList<IEventHandler>();
+        Queue<IEventHandler<? extends IEvent>> handlers =
+          new LinkedList<IEventHandler<? extends IEvent>>();
         
         // First, determine all the valid handlers
         
@@ -143,11 +148,16 @@ public class SynchronousEventDispatcher implements IEventDispatcher
 
         // self handlers ARE ALWAYS called first
         if (event instanceof ISelfHandlingEvent)
-          handlers.add((IEventHandler)event);
-
+        {
+          ISelfHandlingEvent<? extends IEvent> selfHandlingEvent =
+            (ISelfHandlingEvent<? extends IEvent>)event;
+          
+          handlers.add(selfHandlingEvent);
+        }
         synchronized(mHandlers)
         {
-          Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
+          Map<Integer, List<IEventHandler<? extends IEvent>>> priorities
+            = mHandlers.get(className);
           if (priorities != null)
           {
             Set<Integer> priorityKeys = priorities.keySet();
@@ -155,7 +165,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
             while(orderedKeys.hasNext())
             {
               Integer priority = orderedKeys.next();
-              List<IEventHandler> priHandlers = priorities.get(priority);
+              List<IEventHandler<? extends IEvent>> priHandlers
+                = priorities.get(priority);
               if (priHandlers != null)
               {
                 handlers.addAll(priHandlers);
@@ -164,9 +175,10 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           }
         }
         //log.debug("Handling event: {} with {} handlers", event, handlers.size());
-        Iterator<IEventHandler> handlersIter = handlers.iterator();
+        Iterator<IEventHandler<? extends IEvent>> handlersIter = handlers.iterator();
         while(!eventHandled && handlersIter.hasNext())
         {
+          // deliberately untyped!
           IEventHandler handler = handlersIter.next();
           //log.debug("Handling event: {} with handler: {}", event, handler);
           eventHandled = handler.handleEvent(this, event);
@@ -182,7 +194,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
 
   public void removeEventHandler(int priority,
       Class<? extends IEvent> eventClass,
-      IEventHandler handler) throws IndexOutOfBoundsException
+      IEventHandler<? extends IEvent> handler) throws IndexOutOfBoundsException
   {
     if (eventClass == null)
       throw new IllegalArgumentException("cannot pass null class");
@@ -194,28 +206,29 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       throw new IllegalArgumentException("cannot get name of class");
     synchronized(mHandlers)
     {
-      Map<Integer, List<IEventHandler>> priorities = mHandlers.get(className);
+      Map<Integer, List<IEventHandler<? extends IEvent>>> priorities
+        = mHandlers.get(className);
       if (priorities == null)
       {
         // could not find entry in list
         throw new IndexOutOfBoundsException();
       }
 
-      List<IEventHandler> handlers = priorities.get(priority);
+      List<IEventHandler<? extends IEvent>> handlers = priorities.get(priority);
       if (handlers == null)
       {
         // could not find entry in list
         throw new IndexOutOfBoundsException();
       }
 
-      ListIterator<IEventHandler> iter = handlers.listIterator();
+      ListIterator<IEventHandler<? extends IEvent>> iter = handlers.listIterator();
       // Walk through and remove all copies of this handler.
       // someone may have registered multiple copies of the same
       // handler, and we nuke them all
       int handlersNuked = 0;
       while(iter.hasNext())
       {
-        IEventHandler registeredHandler = iter.next();
+        IEventHandler<? extends IEvent> registeredHandler = iter.next();
         if (registeredHandler == handler)
         {
           iter.remove();

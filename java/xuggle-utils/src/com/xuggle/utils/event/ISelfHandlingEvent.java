@@ -37,6 +37,7 @@ package com.xuggle.utils.event;
  *
  */
 
-public interface ISelfHandlingEvent extends IEvent, IEventHandler
+public interface ISelfHandlingEvent<E extends IEvent>
+extends IEvent, IEventHandler<E>
 {
 }

@@ -221,13 +221,15 @@ public class StateMachine implements IEventHandlerRegistrable
     }
 
     public void addEventHandler(int priority,
-        Class<? extends IEvent> eventClass, IEventHandler handler)
+        Class<? extends IEvent> eventClass,
+        IEventHandler<? extends IEvent> handler)
     {
       getEventDispatcher().addEventHandler(priority, eventClass, handler);
     }
 
     public void removeEventHandler(int priority,
-        Class<? extends IEvent> eventClass, IEventHandler handler)
+        Class<? extends IEvent> eventClass,
+        IEventHandler<? extends IEvent> handler)
         throws IndexOutOfBoundsException
     {
       getEventDispatcher().removeEventHandler(priority, eventClass, handler);

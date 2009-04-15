@@ -38,7 +38,8 @@ import org.junit.runner.RunWith;
  */
 
 @RunWith(NameAwareTestClassRunner.class)
-class DoorStateMachine extends StateMachine implements IDoorControl, IEventHandler
+class DoorStateMachine extends StateMachine implements IDoorControl,
+IEventHandler<IEvent>
 {
     static Logger log = LoggerFactory.getLogger(DoorStateMachine.class);
 

@@ -34,7 +34,7 @@ package com.xuggle.utils.event;
  * @author aclarke
  *
  */
-public interface IEventHandler
+public interface IEventHandler<E extends IEvent>
 {
 
   /**
@@ -46,5 +46,5 @@ public interface IEventHandler
    * @return true means the event was handled, and it should not be passed to
    *   any other handler.
    */
-  boolean handleEvent(IEventDispatcher dispatcher, IEvent event);
+  boolean handleEvent(IEventDispatcher dispatcher, E event);
 }

@@ -220,7 +220,7 @@ public class StateMachineTest
     {
       final Watcher w = new Watcher(from, to);
 
-      w.handler = new IEventHandler()
+      w.handler = new IEventHandler<IEvent>()
         {
             
             public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
@@ -272,7 +272,7 @@ public class StateMachineTest
         public State         to;
         public State         from;
         public boolean       found = false;
-        public IEventHandler handler;
+        public IEventHandler<IEvent> handler;
 
         Watcher(State from, State to)
         {

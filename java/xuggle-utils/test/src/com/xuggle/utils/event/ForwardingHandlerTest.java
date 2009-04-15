@@ -45,7 +45,7 @@ public class ForwardingHandlerTest
     
     // and register the actual handler
     toDispatcher.addEventHandler(0, event.getClass(),
-        new IEventHandler() {
+        new IEventHandler<IEvent>() {
           public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
           {
             wasForwarded.set(true);
@@ -74,7 +74,7 @@ public class ForwardingHandlerTest
     
     // and register the actual handler
     toDispatcher.addEventHandler(0, event.getClass(),
-        new IEventHandler() {
+        new IEventHandler<IEvent>() {
           public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
           {
             wasForwarded.set(true);
