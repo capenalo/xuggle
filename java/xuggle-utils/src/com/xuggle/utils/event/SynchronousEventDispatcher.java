@@ -20,6 +20,8 @@
  */
 package com.xuggle.utils.event;
 
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,6 +62,38 @@ import org.slf4j.LoggerFactory;
 
 public class SynchronousEventDispatcher implements IEventDispatcher
 {
+  private class HandlerReference extends WeakReference<IEventHandler<? extends IEvent>>
+  {
+    private final Class<? extends IEvent> mClass;
+    private final int mPriority;
+    private final boolean mKeepingWeakReference;
+    public HandlerReference(IEventHandler<? extends IEvent> referent,
+        ReferenceQueue<IEventHandler<? extends IEvent>> q,
+            int priority, Class<? extends IEvent> clazz,
+            boolean useWeakReference
+    )
+    {
+      super(referent, q);
+      mClass = clazz;
+      mPriority = priority;
+      mKeepingWeakReference = useWeakReference; 
+    }
+
+    public Class<? extends IEvent> getEventClass()
+    {
+      return mClass;
+    }
+
+    public int getPriority()
+    {
+      return mPriority;
+    }
+
+    public boolean isKeepingWeakReference()
+    {
+      return mKeepingWeakReference;
+    }
+  }
   final private Logger log = LoggerFactory.getLogger(this.getClass());
 
   /**
@@ -70,24 +104,38 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    *        A list of event Handlers
    */
 
+  private final Map<IEventHandler<? extends IEvent>,
+   Queue<IEventHandler<? extends IEvent>>> mStrongReferences;
   private final Map<String, SortedMap<Integer,
-    List<IEventHandler<? extends IEvent>>>> mHandlers;
+  List<HandlerReference>>> mHandlers;
   
   private final AtomicLong mNumNestedEventDispatches;
   private final Queue<IEvent> mPendingEventDispatches;
+
+  private ReferenceQueue<IEventHandler<? extends IEvent>> mReferenceQueue;
 
   public SynchronousEventDispatcher()
   {
     mNumNestedEventDispatches = new AtomicLong(0);
     mPendingEventDispatches = new ConcurrentLinkedQueue<IEvent>();
+    mStrongReferences = new HashMap<IEventHandler<? extends IEvent>,
+    Queue<IEventHandler<? extends IEvent>>>(); 
     mHandlers = new HashMap<String, SortedMap<Integer,
-      List<IEventHandler<? extends IEvent>>>>();
+      List<HandlerReference>>>();
+    mReferenceQueue = new ReferenceQueue<IEventHandler<? extends IEvent>>();
     log.trace("<init>");
   }
   
   public void addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler)
+  {
+    addEventHandler(priority, eventClass, handler, false);
+  }
+  public void addEventHandler(int priority,
+      Class<? extends IEvent> eventClass,
+      IEventHandler<? extends IEvent> handler,
+      boolean useWeakReferences)
   {
     if (eventClass == null)
       throw new IllegalArgumentException("cannot pass null class");
@@ -98,25 +146,43 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     if (className == null || className.length() <= 0)
       throw new IllegalArgumentException("cannot get name of class");
    
+    HandlerReference reference = new HandlerReference(handler, 
+        mReferenceQueue,
+        priority,
+        eventClass,
+        useWeakReferences);
     synchronized(mHandlers)
     {
-      SortedMap<Integer, List<IEventHandler<? extends IEvent>>> priorities
+      SortedMap<Integer, List<HandlerReference>> priorities
         = mHandlers.get(className);
       if (priorities == null)
       {
-        priorities = new TreeMap<Integer, List<IEventHandler<? extends IEvent>>>();
+        priorities = new TreeMap<Integer, List<HandlerReference>>();
         mHandlers.put(className, priorities);
       }
 
-      List<IEventHandler<? extends IEvent>> handlers = priorities.get(priority);
+      List<HandlerReference> handlers = priorities.get(priority);
       if (handlers == null)
       {
-        handlers = new ArrayList<IEventHandler<? extends IEvent>>();
+        handlers = new ArrayList<HandlerReference>();
         priorities.put(priority, handlers);
       }
-      handlers.add(handler);
+      handlers.add(reference);
+      if (!useWeakReferences) {
+        Queue<IEventHandler<? extends IEvent>> refs =
+          mStrongReferences.get(handler);
+        if (refs == null) {
+          refs = new LinkedList<IEventHandler<? extends IEvent>>();
+          mStrongReferences.put(handler, refs);
+        }
+        refs.offer(handler);
+      }
       // and we're done.
     }
+    
+    // now outside the lock, communicate what just happened
+    dispatchEvent(new AddEventHandlerEvent(this, priority, eventClass, handler,
+        useWeakReferences));
   }
 
   @SuppressWarnings("unchecked")
@@ -156,7 +222,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         }
         synchronized(mHandlers)
         {
-          Map<Integer, List<IEventHandler<? extends IEvent>>> priorities
+          Map<Integer, List<HandlerReference>> priorities
             = mHandlers.get(className);
           if (priorities != null)
           {
@@ -165,11 +231,16 @@ public class SynchronousEventDispatcher implements IEventDispatcher
             while(orderedKeys.hasNext())
             {
               Integer priority = orderedKeys.next();
-              List<IEventHandler<? extends IEvent>> priHandlers
+              List<HandlerReference> priHandlers
                 = priorities.get(priority);
               if (priHandlers != null)
               {
-                handlers.addAll(priHandlers);
+                for(HandlerReference reference : priHandlers)
+                {
+                  IEventHandler<? extends IEvent> handler = reference.get();
+                  if (handler != null)
+                    handlers.add(handler);
+                }
               }
             }
           }
@@ -184,12 +255,72 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           eventHandled = handler.handleEvent(this, event);
         }
         //log.debug("Handling event: {} done", event);
+        
+        // and finish by checking our reference queue and removing any event
+        // handlers that are now dead.
+        HandlerReference deadRef;
+        while((deadRef = (HandlerReference)mReferenceQueue.poll()) != null)
+          removeDeadHandler(deadRef);
       }
     }
     finally
     {
       mNumNestedEventDispatches.decrementAndGet();
     }
+  }
+
+  private void removeDeadHandler(HandlerReference deadRef)
+  {
+    Class<? extends IEvent> eventClass = deadRef.getEventClass();
+    int priority = deadRef.getPriority();
+    
+    if (eventClass == null)
+      throw new IllegalArgumentException("cannot pass null class");
+
+    String className = eventClass.getName();
+    if (className == null || className.length() <= 0)
+      throw new IllegalArgumentException("cannot get name of class");
+    synchronized(mHandlers)
+    {
+      Map<Integer, List<HandlerReference>> priorities
+        = mHandlers.get(className);
+      if (priorities == null)
+      {
+        // could not find entry in list
+        return;
+      }
+
+      List<HandlerReference> handlers = priorities.get(priority);
+      if (handlers == null)
+      {
+        // could not find entry in list
+        return;
+      }
+
+      ListIterator<HandlerReference> iter = handlers.listIterator();
+      while(iter.hasNext())
+      {
+        HandlerReference registeredHandlerReference = iter.next();
+        if (registeredHandlerReference == deadRef)
+        {
+          iter.remove();
+        }
+      }
+      if (handlers.size() ==0)
+      {
+        // All handlers were removed for this priority; clean up.
+        priorities.remove(priority);
+      }
+      if (priorities.size() == 0)
+      {
+        // all priorities were removed for this class; clean up
+        mHandlers.remove(className);
+      }
+    }
+    // now outside the lock, communicate what just happened
+    dispatchEvent(new RemoveEventHandlerEvent(this, priority, eventClass,
+        null));
+
   }
 
   public void removeEventHandler(int priority,
@@ -206,7 +337,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       throw new IllegalArgumentException("cannot get name of class");
     synchronized(mHandlers)
     {
-      Map<Integer, List<IEventHandler<? extends IEvent>>> priorities
+      Map<Integer, List<HandlerReference>> priorities
         = mHandlers.get(className);
       if (priorities == null)
       {
@@ -214,25 +345,41 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         throw new IndexOutOfBoundsException();
       }
 
-      List<IEventHandler<? extends IEvent>> handlers = priorities.get(priority);
+      List<HandlerReference> handlers = priorities.get(priority);
       if (handlers == null)
       {
         // could not find entry in list
         throw new IndexOutOfBoundsException();
       }
 
-      ListIterator<IEventHandler<? extends IEvent>> iter = handlers.listIterator();
+      ListIterator<HandlerReference> iter = handlers.listIterator();
       // Walk through and remove all copies of this handler.
       // someone may have registered multiple copies of the same
       // handler, and we nuke them all
       int handlersNuked = 0;
       while(iter.hasNext())
       {
-        IEventHandler<? extends IEvent> registeredHandler = iter.next();
+        HandlerReference registeredHandlerReference = iter.next();
+        IEventHandler<? extends IEvent> registeredHandler = 
+          registeredHandlerReference.get();
         if (registeredHandler == handler)
         {
           iter.remove();
           ++handlersNuked;
+          if (registeredHandlerReference.isKeepingWeakReference())
+          {
+            Queue<IEventHandler<? extends IEvent>> refs =
+              mStrongReferences.get(handler);
+            if (refs != null)
+            {
+              // get ride of one reference we kept
+              refs.poll();
+              // and kill the index entry if this is the last
+              // reference
+              if (refs.size() == 0)
+                mStrongReferences.remove(registeredHandler);
+            }
+          }
         }
       }
       if (handlersNuked == 0)
@@ -251,6 +398,9 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         mHandlers.remove(className);
       }
     }
+    // now outside the lock, communicate what just happened
+    dispatchEvent(new RemoveEventHandlerEvent(this, priority, eventClass, handler));
+
   }
 
 }

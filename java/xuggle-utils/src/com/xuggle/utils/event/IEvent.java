@@ -33,9 +33,18 @@ public interface IEvent
    * Get a reference to the Object that generated this
    * event.
    * 
-   * It is recommended that subclasses of IEvent create a 
-   * Foo getSourceFoo() if it's known that only Foo can
-   * create the event to avoid casting by callers.
+   * It is recommended that subclasses Foo of IEvent override this
+   * method to create a method that returns FooSourceType if
+   * it's known that only FooSourceType can create a Foo event.  For
+   * example:
+   * <pre> 
+   * FooSourceType getSource()
+   * {
+   *   return (FooSourceType) super.getSource();
+   * }
+   * </pre>
+   * 
+   * This helps avoid casting by callers.
    * 
    * @return The source of this event.
    */

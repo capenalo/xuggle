@@ -28,13 +28,14 @@ import org.slf4j.LoggerFactory;
 /**
  * The standard implementation of {@link IAsynchronousEventDispatcher}.
  */
-public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
+public class AsynchronousEventDispatcher 
+extends SynchronousEventDispatcher
+implements IAsynchronousEventDispatcher
 {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private Thread mDispatchThread;
   private LinkedList<IEvent> mEventQueue;
-  private SynchronousEventDispatcher mDispatcher;
 
   /**
    * Create a new event dispatcher
@@ -46,7 +47,6 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
   {
     mDispatchThread = null;
     mEventQueue = new LinkedList<IEvent>();
-    mDispatcher = new SynchronousEventDispatcher();
     this.setupDispatching();
     if (autoStartDispatching)
       this.startDispatching();
@@ -124,15 +124,6 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
     return mDispatchThread.isAlive();
   }
 
-  public void addEventHandler(int priority, Class<? extends IEvent> eventClass,
-      IEventHandler<? extends IEvent> handler)
-  {
-    synchronized(this)
-    {
-      mDispatcher.addEventHandler(priority, eventClass, handler);
-    }
-  }
-
   public void dispatchEvent(IEvent event)
   {
     if (event == null)
@@ -151,16 +142,6 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
       }
       // and let the dispatch thread know
       this.notifyAll();
-    }
-  }
-
-  public synchronized void removeEventHandler(int priority,
-      Class<? extends IEvent> eventClass,
-      IEventHandler<? extends IEvent> handler) throws IndexOutOfBoundsException
-  {
-    synchronized(this)
-    {
-      mDispatcher.removeEventHandler(priority, eventClass, handler);
     }
   }
 
@@ -191,7 +172,8 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
       }
 
       if (event instanceof EventDispatcherStopEvent ||
-          event instanceof EventDispatcherAbortEvent)
+          event instanceof EventDispatcherAbortEvent ||
+          Thread.interrupted())
       {
         synchronized(this)
         {
@@ -201,7 +183,16 @@ public class AsynchronousEventDispatcher implements IAsynchronousEventDispatcher
           mEventQueue.clear();
         }
       } else {
-        mDispatcher.dispatchEvent(event);
+        try
+        {
+          super.dispatchEvent(event);
+        } catch (Throwable t)
+        {
+          log.error("Dispatcher continuing after unhandled event: {}",
+              t
+              );
+          t.printStackTrace();
+        }
       }
     }
   }
