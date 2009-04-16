@@ -23,6 +23,7 @@ package com.xuggle.utils.event;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -403,5 +404,111 @@ public class SynchronousEventDispatcherTest
       dispatcher.dispatchEvent(firstEvent);
       assertTrue(gotFirstEvent.get());
       assertTrue(gotSecondEvent.get());
+  }
+
+  @Test
+  public void testAddAndRemoveEventHandlersFireCorrectEvents()
+  {
+    IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+    
+    final AtomicInteger numAdds = new AtomicInteger(0);
+    final AtomicInteger numRemoves = new AtomicInteger(0);
+
+    IEventHandler<AddEventHandlerEvent> addHandler = 
+      new IEventHandler<AddEventHandlerEvent>(){
+      public boolean handleEvent(IEventDispatcher dispatcher,
+          AddEventHandlerEvent event)
+      {
+        numAdds.incrementAndGet();
+        return false;
+      }
+    };
+    IEventHandler<RemoveEventHandlerEvent> removeHandler =
+      new IEventHandler<RemoveEventHandlerEvent>(){
+
+        public boolean handleEvent(IEventDispatcher dispatcher,
+            RemoveEventHandlerEvent event)
+        {
+          numRemoves.incrementAndGet();
+          return false;
+        }};
+      
+    dispatcher.addEventHandler(0, AddEventHandlerEvent.class,
+        addHandler
+    );
+    dispatcher.addEventHandler(0, RemoveEventHandlerEvent.class,
+        removeHandler
+    );
+    dispatcher.removeEventHandler(0, AddEventHandlerEvent.class,
+        addHandler);
+    dispatcher.removeEventHandler(0, RemoveEventHandlerEvent.class,
+        removeHandler
+    );
+    assertEquals(2, numAdds.get());
+    assertEquals(1, numRemoves.get()); // shouldn't get the last remove
+  }
+  /**
+   * This test can take a LONG time to execute; it requires the
+   * Java garbage collector to collect a reference, hence the
+   * long timeout for slow machines. 
+   */
+  
+  @Test(timeout=1000*60*5) // 5 minute timeout.
+  public void testAddEventHandlerWeakReference()
+  {
+    class TestEvent extends Event {
+      public TestEvent(Object source) { super(source); }
+    }
+    IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+    
+    final AtomicInteger numAddEventHandlers = new AtomicInteger(0);
+    final AtomicInteger numRemoveEventHandlers = new AtomicInteger(0);
+    final AtomicBoolean gotWeakReferenceCleanup = new AtomicBoolean(false);
+    dispatcher.addEventHandler(0, AddEventHandlerEvent.class,
+        new IEventHandler<AddEventHandlerEvent>(){
+          public boolean handleEvent(IEventDispatcher dispatcher,
+              AddEventHandlerEvent event)
+          {
+            numAddEventHandlers.incrementAndGet();
+            return false;
+          }});
+    dispatcher.addEventHandler(0, RemoveEventHandlerEvent.class,
+        new IEventHandler<RemoveEventHandlerEvent>(){
+          public boolean handleEvent(IEventDispatcher dispatcher,
+              RemoveEventHandlerEvent event)
+          {
+            numRemoveEventHandlers.incrementAndGet();
+            assertNull("should only be called when removing weak reference",
+                event.getHandler());
+            gotWeakReferenceCleanup.getAndSet(true);
+            return false;
+          }});
+    
+    
+    {
+      // must be different scope
+      IEventHandler<IEvent> weakHandler =
+        new IEventHandler<IEvent>()
+        {
+          public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+          {
+            return false;
+          }
+        
+        };
+      // add with a weak reference
+      dispatcher.addEventHandler(0, TestEvent.class, weakHandler, true);
+      // for shits and giggles do one dispatch
+      dispatcher.dispatchEvent(new TestEvent(this));
+      // kill the reference here
+      weakHandler = null;
+    }
+    while(!gotWeakReferenceCleanup.get())
+    {
+      dispatcher.dispatchEvent(new TestEvent(this));
+      System.gc();
+    }
+    assertEquals(3, numAddEventHandlers.get());
+    assertEquals(1, numRemoveEventHandlers.get());
   }
 }

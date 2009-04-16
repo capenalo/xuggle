@@ -26,10 +26,6 @@ package com.xuggle.utils.sm;
 
 public class State implements IState
 {
-    /** The state machine. */
-  
-    protected StateMachine sm;
-    
     /** string name of the state, not intended to be a unique identifer
      * for the state */
     
@@ -44,22 +40,6 @@ public class State implements IState
     {
       this.name = name;
     }
-
-    /** {@inheritDoc} */
-
-//     @Override
-//     public void registerStateMachine(StateMachine sm)
-//     {
-//       this.sm = sm;
-//     }
-
-//     /** {@inheritDoc} */
-
-//     @Override
-//     public StateMachine getSm()
-//     {
-//       return sm;
-//     }
 
     /** {@inheritDoc} */
     

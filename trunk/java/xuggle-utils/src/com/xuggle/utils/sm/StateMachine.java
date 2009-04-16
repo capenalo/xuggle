@@ -234,4 +234,12 @@ public class StateMachine implements IEventHandlerRegistrable
     {
       getEventDispatcher().removeEventHandler(priority, eventClass, handler);
     }
+
+    public void addEventHandler(int priority,
+        Class<? extends IEvent> eventClass,
+        IEventHandler<? extends IEvent> handler, boolean useWeakReferences)
+    {
+      getEventDispatcher().addEventHandler(priority, eventClass, handler,
+          useWeakReferences);
+    }
 }

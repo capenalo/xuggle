@@ -23,6 +23,7 @@ package com.xuggle.utils.event;
 import static junit.framework.Assert.assertTrue;
 
 
+import com.xuggle.utils.Mutable;
 import com.xuggle.utils.event.AsynchronousEventDispatcher;
 import com.xuggle.utils.event.Event;
 import com.xuggle.utils.event.EventDispatcherAbortEvent;
@@ -232,5 +233,69 @@ public class AsynchronousEventDispatcherTest
     dispatcher.waitForDispatcherToFinish(0);
     // make sure we got the number of events expected
     assertTrue("abort should process before any events", 0 == mNumEventsHandled);
+  }
+  
+  /**
+   * Tests that events dispatched inside an event handler DO NOT
+   * always get executed before events added from another thread.
+   * @throws InterruptedException 
+   */
+  
+  @Test(timeout=10000)
+  public void testEventsDispatchedInsideEventHandlerNoLongerAlwaysGetHandledBeforeOtherEventsAndIsThisFunctionNameLongEnoughIDoNotThinkSo() throws InterruptedException
+  {
+    IAsynchronousEventDispatcher dispatcher = new AsynchronousEventDispatcher();
+    dispatcher.startDispatching();
+    
+    final Mutable<Boolean> secondOutsideEventHandled=new Mutable<Boolean>(false);
+    final Mutable<Boolean> testSucceeded = new Mutable<Boolean>(false);
+    final Object lock = new Object();
+    // make sure our events added OUTSIDE the lock are
+    // added before their handlers execute
+    synchronized(lock) {
+      ISelfHandlingEvent<IEvent> outsideEvent = new SelfHandlingEvent<IEvent>(this)
+      {
+        @Override
+        public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+        {
+          synchronized(lock)
+          {
+            ISelfHandlingEvent<IEvent> insideEvent = new SelfHandlingEvent<IEvent>(this)
+            {
+              @Override
+              public boolean handleEvent(IEventDispatcher dispatcher,
+                  IEvent event)
+              {
+                testSucceeded.set(secondOutsideEventHandled.get());
+                return false;
+              }
+            };
+            dispatcher.dispatchEvent(insideEvent);
+            lock.notify();
+          }
+          return false;
+        }
+        
+      };
+      dispatcher.dispatchEvent(outsideEvent);
+      ISelfHandlingEvent<IEvent> secondOutsideEvent =
+        new SelfHandlingEvent<IEvent>(this){
+          @Override
+          public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+          {
+            secondOutsideEventHandled.set(true);
+            return false;
+          }};
+      dispatcher.dispatchEvent(secondOutsideEvent);    
+      lock.wait();
+    }
+    // by waiting above we guarantee that all events have been dispatched
+    // but not necessarily handled
+    dispatcher.stopDispatching();
+    dispatcher.waitForDispatcherToFinish(0);
+    assertTrue(secondOutsideEventHandled.get());
+    assertTrue("should execute AFTER the secondEvent", 
+        testSucceeded.get());
+    
   }
 }

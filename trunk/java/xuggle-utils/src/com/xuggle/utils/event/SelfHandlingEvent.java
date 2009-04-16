@@ -32,9 +32,6 @@ extends Event
 implements ISelfHandlingEvent<E>
 {
 
-  /**
-   * {@inheritDoc}
-   */
   public SelfHandlingEvent(Object aSource)
   {
     super(aSource);
