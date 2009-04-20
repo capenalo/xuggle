@@ -23,7 +23,7 @@ package com.xuggle.red5.io;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.core.buffer.IoBuffer;
 import org.red5.io.amf.Output;
 import org.red5.io.object.Serializer;
 import org.red5.io.utils.IOUtils;
@@ -76,8 +76,8 @@ public class Red5Handler implements IURLProtocolHandler
 
   IRTMPEventIOHandler mHandler;
 
-  ByteBuffer mCurrentInputBuffer = null;
-  ByteBuffer mCurrentOutputBuffer = null;
+  IoBuffer mCurrentInputBuffer = null;
+  IoBuffer mCurrentOutputBuffer = null;
 
   String mUrl;
   int mOpenFlags;
@@ -113,12 +113,10 @@ public class Red5Handler implements IURLProtocolHandler
     // BufferStream that we're no longer actively handling it.
     if (mCurrentInputBuffer != null)
     {
-      mCurrentInputBuffer.release();
       mCurrentInputBuffer = null;
     }
     if (mCurrentOutputBuffer != null)
     {
-      mCurrentOutputBuffer.release();
       mCurrentOutputBuffer = null;
     }
     if (mOpenFlags == IURLProtocolHandler.URL_RDWR
@@ -142,12 +140,10 @@ public class Red5Handler implements IURLProtocolHandler
 
     if (mCurrentInputBuffer != null)
     {
-      mCurrentInputBuffer.release();
       mCurrentInputBuffer = null;
     }
     if (mCurrentOutputBuffer != null)
     {
-      mCurrentOutputBuffer.release();
       mCurrentOutputBuffer = null;
     }
     mReadEndOfStream = false;
@@ -173,7 +169,8 @@ public class Red5Handler implements IURLProtocolHandler
     if (mCurrentInputBuffer == null)
     {
       // start with the requested side.
-      mCurrentInputBuffer = ByteBuffer.allocate(size);
+      mCurrentInputBuffer = IoBuffer.allocate(size); 
+
       // and let it auto grow.
       mCurrentInputBuffer.setAutoExpand(true);
       // and set the limit to zero.
@@ -298,7 +295,7 @@ public class Red5Handler implements IURLProtocolHandler
     int retval = 0;
     if (mCurrentOutputBuffer == null)
     {
-      mCurrentOutputBuffer = ByteBuffer.allocate(size
+      mCurrentOutputBuffer = IoBuffer.allocate(size
           + FLV_FILE_HEADER_SIZE + FLV_TAG_HEADER_SIZE);
       mCurrentOutputBuffer.setAutoExpand(true);
       // reset position and limit to 0.  we use the limit() as the
@@ -427,7 +424,7 @@ public class Red5Handler implements IURLProtocolHandler
     return retval;
   }
 
-  private IRTMPEvent parseFLVTag(ByteBuffer in)
+  private IRTMPEvent parseFLVTag(IoBuffer in)
   {
     IRTMPEvent retval = null;
     EtmPoint point = profiler.createPoint(this.getClass().getName()+"#parseFLVTag");
@@ -458,12 +455,12 @@ public class Red5Handler implements IURLProtocolHandler
 
     // I hate what I'm about to do here, but it appears the easiest
     // way.
-    ByteBuffer bodyBuffer = null;
+    IoBuffer bodyBuffer = null;
     try
     {
       byte[] copyBuf = new byte[1024];
       int totalBytesToCopy = bodySize;
-      bodyBuffer = ByteBuffer.allocate(bodySize);
+      bodyBuffer = IoBuffer.allocate(bodySize);
 
       while (totalBytesToCopy > 0)
       {
@@ -501,7 +498,6 @@ public class Red5Handler implements IURLProtocolHandler
     {
       if (bodyBuffer != null)
       {
-        bodyBuffer.release();
         bodyBuffer = null;
       }
     }
@@ -522,7 +518,7 @@ public class Red5Handler implements IURLProtocolHandler
   /*
    * @return # of bytes processed
    */
-  private int parseFLVHeader(ByteBuffer in)
+  private int parseFLVHeader(IoBuffer in)
   {
     EtmPoint point = profiler.createPoint(this.getClass().getName()+"#parseFLVHeader");
     try {
@@ -571,7 +567,8 @@ public class Red5Handler implements IURLProtocolHandler
     return this.getClass().getName() + ":" + mUrl;
   }
 
-  private void appendFLVTag(byte dataType, int timestamp, ByteBuffer data, ByteBuffer in)
+  private void appendFLVTag(byte dataType, int timestamp,
+      IoBuffer data, IoBuffer in)
   {
     EtmPoint point = profiler.createPoint(this.getClass().getName()+"#appendFLVTag");
     try
@@ -617,12 +614,12 @@ public class Red5Handler implements IURLProtocolHandler
     }
   }
 
-  private void appendRTMPEvent(IRTMPEvent event, ByteBuffer in)
+  private void appendRTMPEvent(IRTMPEvent event, IoBuffer in)
   {
     EtmPoint point = profiler.createPoint(this.getClass().getName()+"#appendRTMPEvent");
     try
     {
-      ByteBuffer data = null;
+      IoBuffer data = null;
 
       if (event instanceof IStreamData)
       {
@@ -645,7 +642,7 @@ public class Red5Handler implements IURLProtocolHandler
     }
   }
 
-  private void appendFLVHeader(ByteBuffer in)
+  private void appendFLVHeader(IoBuffer in)
   {
     EtmPoint point = profiler.createPoint(this.getClass().getName()+"#appendFLVHeader");
     try {
@@ -709,7 +706,7 @@ public class Red5Handler implements IURLProtocolHandler
     log.debug("add metaData[{}]={}", key, value);
     params.put(key, value);
   }  
-  private void appendMetaData(int timestamp, ByteBuffer in)
+  private void appendMetaData(int timestamp, IoBuffer in)
   {
     EtmPoint point = profiler.createPoint(this.getClass().getName()+"#appendMetaData");
     try {
@@ -832,7 +829,7 @@ public class Red5Handler implements IURLProtocolHandler
       // hey by default we're NON seekable streams; deal with it.
       addMetaData(params, "canSeekToEnd", new Boolean(false));
 
-      ByteBuffer amfData = ByteBuffer.allocate(1024);
+      IoBuffer amfData = IoBuffer.allocate(1024);
       amfData.setAutoExpand(true);
       Output amfOutput = new Output(amfData);
       amfOutput.writeString("onMetaData");
