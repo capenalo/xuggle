@@ -20,7 +20,7 @@
  */
 package com.xuggle.red5.io;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.core.buffer.IoBuffer;
 import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
@@ -252,7 +252,7 @@ public class Red5Message
           throw new IllegalArgumentException("cannot pass null audio data");
         if (!(aData instanceof AudioData))
           throw new IllegalArgumentException("cannot pass non AudioData for audio");
-        ByteBuffer data = ((AudioData)aData).getData();
+        IoBuffer data = ((AudioData)aData).getData();
         if (data == null)
           throw new IllegalArgumentException("cannot pass empty audio data for audio");
         data.rewind();
@@ -350,7 +350,7 @@ public class Red5Message
           throw new IllegalArgumentException("cannot pass null video data");
         if (!(aData instanceof VideoData))
           throw new IllegalArgumentException("cannot pass non VideoData for video");
-        ByteBuffer data = ((VideoData)aData).getData();
+        IoBuffer data = ((VideoData)aData).getData();
         if (data == null)
           throw new IllegalArgumentException("cannot pass empty video data for video");
         data.rewind();
