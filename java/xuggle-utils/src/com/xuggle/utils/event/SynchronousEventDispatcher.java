@@ -366,7 +366,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         {
           iter.remove();
           ++handlersNuked;
-          if (registeredHandlerReference.isKeepingWeakReference())
+          if (!registeredHandlerReference.isKeepingWeakReference())
           {
             Queue<IEventHandler<? extends IEvent>> refs =
               mStrongReferences.get(handler);
@@ -380,6 +380,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
                 mStrongReferences.remove(registeredHandler);
             }
           }
+          // and we're done; break the loop
+          break;
         }
       }
       if (handlersNuked == 0)
