@@ -21,7 +21,6 @@
 package com.xuggle.utils;
 
 import java.text.DecimalFormat;
-import java.text.Format;
 import java.text.NumberFormat;
 import java.util.concurrent.TimeUnit;
 
