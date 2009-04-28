@@ -27,13 +27,20 @@ public abstract class Event implements IEvent
 {
 
   private final Object mSource;
+  private final long mNow;
 
   public Event(Object aSource)
   {
     mSource = aSource;
+    mNow = System.nanoTime();
   }
-  public Object getSource() {
+  public Object getSource()
+  {
     return mSource;
+  }
+  public long getWhen()
+  {
+    return mNow;
   }
 
 }

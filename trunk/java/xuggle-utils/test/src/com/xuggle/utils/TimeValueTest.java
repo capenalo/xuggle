@@ -143,5 +143,13 @@ public class TimeValueTest
     TimeValue d1 = new TimeValue(Long.MAX_VALUE, TimeUnit.MICROSECONDS);
     d1.compareTo(null); // should throw exception
   }
+  
+  @Test
+  public void testStringFormat()
+  {
+    TimeValue d1 = new TimeValue(Long.MAX_VALUE, TimeUnit.MICROSECONDS);
+    String s = d1.toString();
+    assertEquals("9,223,372,036,854,775,807 (MICROSECONDS)", s);
+  }
 
 }
