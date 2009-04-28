@@ -20,6 +20,9 @@
  */
 package com.xuggle.utils;
 
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.NumberFormat;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -150,9 +153,15 @@ public final class TimeValue implements Comparable<TimeValue>
     return (int)TimeUnit.NANOSECONDS.convert(mValue, mUnit);
   }
   
+  /**
+   * Returns a string value, as a decimal number of seconds.
+   * 
+   */
   @Override
   public String toString()
   {
-    return "" + mValue + "(" + mUnit + ")";
+    NumberFormat format = new DecimalFormat("###,###,###,###,###,###,###");
+    String s = format.format(mValue);
+    return s + " (" + mUnit + ")";
   }
 }

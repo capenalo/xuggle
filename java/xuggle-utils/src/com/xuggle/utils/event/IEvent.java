@@ -49,5 +49,13 @@ public interface IEvent
    * @return The source of this event.
    */
   Object getSource();
+  
+  /**
+   * When was this event created?
+   * 
+   * @return The time, as returned from {@link System#nanoTime()} when
+   * this event was created.
+   */
+  long getWhen();
 
 }
