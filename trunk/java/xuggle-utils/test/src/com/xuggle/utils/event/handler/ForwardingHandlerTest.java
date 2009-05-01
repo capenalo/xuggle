@@ -1,10 +1,16 @@
-package com.xuggle.utils.event;
+package com.xuggle.utils.event.handler;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import com.xuggle.utils.Mutable;
+import com.xuggle.utils.event.Event;
+import com.xuggle.utils.event.IEvent;
+import com.xuggle.utils.event.IEventDispatcher;
+import com.xuggle.utils.event.IEventHandler;
+import com.xuggle.utils.event.SynchronousEventDispatcher;
+import com.xuggle.utils.event.handler.ForwardingHandler;
 
 public class ForwardingHandlerTest
 {
