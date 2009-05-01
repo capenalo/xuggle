@@ -19,7 +19,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package com.xuggle.utils.event;
+package com.xuggle.utils.event.handler;
+
+import com.xuggle.utils.event.IEvent;
+import com.xuggle.utils.event.IEventDispatcher;
+import com.xuggle.utils.event.IEventHandler;
 
 /**
  * A ForwardingHandler will take an event it is registered for,
@@ -47,7 +51,7 @@ public class ForwardingHandler implements IEventHandler<IEvent>
    *   has any required handlers registered.
    */
   
-  public ForwardingHandler(IEventDispatcher aDispatcher)
+  protected ForwardingHandler(IEventDispatcher aDispatcher)
   {
     if (aDispatcher == null)
       throw new IllegalArgumentException("need dispatcher to dispatch to");

@@ -152,4 +152,12 @@ public class TimeValueTest
     assertEquals("9,223,372,036,854,775,807 (MICROSECONDS)", s);
   }
 
+  @Test
+  public void testConvert()
+  {
+    TimeValue d1 = new TimeValue(2, TimeUnit.MICROSECONDS);
+    
+    long nanoSeconds = d1.get(TimeUnit.NANOSECONDS);
+    assertEquals(2000, nanoSeconds);
+  }
 }
