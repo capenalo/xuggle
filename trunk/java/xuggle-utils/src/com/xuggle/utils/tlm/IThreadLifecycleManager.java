@@ -39,31 +39,31 @@ public interface IThreadLifecycleManager
   /**
    * The thread we're managing is currently stopped. 
    */
-  public static final ThreadState STOPPED = new ThreadStateStopped();
+  public static final IThreadState STOPPED = new ThreadStateStopped();
   /**
    * The thread we're managing is currently started.
    */
-  public static final ThreadState STARTED = new ThreadStateStarted();
+  public static final IThreadState STARTED = new ThreadStateStarted();
   /**
    * The thread we're managing is in the process of starting.
    */
-  public static final ThreadState STARTING = new ThreadStateStarting();
+  public static final IThreadState STARTING = new ThreadStateStarting();
   /**
    * The thread we're managing is in the process of stopping.
    */
-  public static final ThreadState STOPPING = new ThreadStateStopping();
+  public static final IThreadState STOPPING = new ThreadStateStopping();
   
 
   /**
    * This event is fired when the object we're managing has successfully started.
    */
-  public class RunnableStarted extends Event
+  public class RunnableStartedEvent extends Event
   {
     /**
      * Constructor for successful start.
      * @param source The object fired this event.
      */
-    public RunnableStarted(Object source)
+    RunnableStartedEvent(Object source)
     {
       super(source);
     }
@@ -72,10 +72,10 @@ public interface IThreadLifecycleManager
   /**
    * This event is fired when the object we're managing has stopped.
    * 
-   * If an error occurs while stopping, {@link RunnableStopped#getException()}
+   * If an error occurs while stopping, {@link RunnableStoppedEvent#getException()}
    * will return it.
    */
-  public class RunnableStopped extends Event
+  public class RunnableStoppedEvent extends Event
   {
     private final Throwable mException;
    
@@ -83,7 +83,7 @@ public interface IThreadLifecycleManager
      * Constructor for successful stop.
      * @param source The object fired this event.
      */
-    public RunnableStopped(Object source)
+    RunnableStoppedEvent(Object source)
     {
       super(source);
       mException = null;
@@ -93,7 +93,7 @@ public interface IThreadLifecycleManager
      * @param source The object that fired this event.
      * @param exception THe execption that caused the stoppage.
      */
-    public RunnableStopped(Object source, Throwable exception)
+    RunnableStoppedEvent(Object source, Throwable exception)
     {
       super(source);
       mException = exception;
@@ -154,5 +154,5 @@ public interface IThreadLifecycleManager
    * <p/>
    * @return state of worker thread
    */
-  public ThreadState getState();
+  public IThreadState getState();
 }

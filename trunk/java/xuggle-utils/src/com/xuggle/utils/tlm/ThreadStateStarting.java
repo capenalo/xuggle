@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Internal Only.  The {@link IThreadLifecycleManager#STARTING} state.
  */
-public class ThreadStateStarting extends ThreadState
+class ThreadStateStarting extends ThreadState
 {
   Logger log = LoggerFactory.getLogger(this.getClass());
 

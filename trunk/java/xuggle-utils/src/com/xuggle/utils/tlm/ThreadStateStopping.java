@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Internal Only.  The {@link IThreadLifecycleManager#STOPPING} state.
  */
-public class ThreadStateStopping extends ThreadState
+class ThreadStateStopping extends ThreadState
 {
   Logger log = LoggerFactory.getLogger(this.getClass());
 
