@@ -240,9 +240,9 @@ public class ThreadLifecycleManager extends StateMachine
   }
 
   @Override
-  public ThreadState getState()
+  public IThreadState getState()
   {
-    return (ThreadState) super.getState();
+    return (IThreadState) super.getState();
   }
 
   public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
@@ -287,7 +287,7 @@ public class ThreadLifecycleManager extends StateMachine
   /**
    * The following methods are for calling from the states.
    */
-  void setState(ThreadState newState, Throwable t)
+  void setState(IThreadState newState, Throwable t)
   {
     synchronized(this)
     {
@@ -306,9 +306,9 @@ public class ThreadLifecycleManager extends StateMachine
       this.notifyAll();
     }
     if (newState == STARTED)
-      this.getEventDispatcher().dispatchEvent(new IThreadLifecycleManager.RunnableStarted(this));
+      this.getEventDispatcher().dispatchEvent(new IThreadLifecycleManager.RunnableStartedEvent(this));
     else if (newState == STOPPED)
-      this.getEventDispatcher().dispatchEvent(new IThreadLifecycleManager.RunnableStopped(this, t));
+      this.getEventDispatcher().dispatchEvent(new IThreadLifecycleManager.RunnableStoppedEvent(this, t));
   }
   
   void startWorker()
@@ -333,7 +333,7 @@ public class ThreadLifecycleManager extends StateMachine
     {
       synchronized(this)
       {
-        ThreadState state = this.getState();
+        IThreadState state = this.getState();
         
         // don't start unless stopped
         if (state == STOPPED)

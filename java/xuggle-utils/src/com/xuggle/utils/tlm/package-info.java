@@ -67,9 +67,9 @@
  * Less interested parties can just register {@link com.xuggle.utils.event.IEventHandler}s
  * on the {@link com.xuggle.utils.tlm.ThreadLifecycleManager}
  * for the
- * {@link com.xuggle.utils.tlm.IThreadLifecycleManager.RunnableStarted}
+ * {@link com.xuggle.utils.tlm.IThreadLifecycleManager.RunnableStartedEvent}
  * or
- * {@link com.xuggle.utils.tlm.IThreadLifecycleManager.RunnableStopped}
+ * {@link com.xuggle.utils.tlm.IThreadLifecycleManager.RunnableStoppedEvent}
  * events.
  * </p>
  */

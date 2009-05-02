@@ -56,7 +56,7 @@ class ThreadWorker implements Runnable
     Throwable uncaughtException = null;
     try
     {
-      ThreadState state = null;
+      IThreadState state = null;
       // wait for the state machine to acknowledge we're starting
       synchronized(mMgr)
       {

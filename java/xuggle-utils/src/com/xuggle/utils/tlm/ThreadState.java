@@ -25,7 +25,7 @@ import com.xuggle.utils.sm.State;
 /**
  * Internal Only. An abstract base class for states a thread can be in.
  */
-public abstract class ThreadState extends State
+abstract class ThreadState extends State implements IThreadState
 {
   public ThreadState(String name)
   {
