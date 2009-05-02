@@ -5,7 +5,7 @@ import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
 
 /**
- * An event handler wrapper that wraps another {@link IEventHandler} but
+ * An event handler wrapper that proxies another {@link IEventHandler} but
  * only calls it if 
  *  {@link IEvent#getSource()} is the same as the source
  *  this object is created with.
@@ -21,23 +21,38 @@ public class TargetedHandler<E extends IEvent> implements IEventHandler<E>
   /**
    * Creates a new object.
    * @param source if non-null, then
-   *  {@link #implHandleEvent(IEventDispatcher, IEvent)} will only be
+   *  the proxiedHandler will only be
    *  called if {@link IEvent#getSource()}.equals(source).
+   *  @param proxiedHandler The handler we're proxying for.
+   *  
+   *  @throws IllegalArgumentException if proxiedHandler == null
    */
-  protected TargetedHandler(Object source, IEventHandler<E> handler)
+  protected TargetedHandler(Object source, IEventHandler<E> proxiedHandler)
   {
     mSource = source;
-    if (handler == null)
+    if (proxiedHandler == null)
       throw new IllegalArgumentException();
-    mHandler = handler;
+    mHandler = proxiedHandler;
   }
   
+  /**
+   * The {@link IEvent#getSource()} of an object must
+   * equal this return value in order for us to fire
+   * our {@link #getProxiedHandler()} handler.
+   * @return The source we're targeted on.
+   */
   public Object getTargetedSource()
   {
     return mSource;
   }
   
-  public IEventHandler<E> getTargetedHandler()
+  /**
+   * Returns the {@link IEventHandler} this object calls
+   * when its {@link #handleEvent(IEventDispatcher, IEvent)} method
+   * is called.
+   * @return the proxied event handler.
+   */
+  public IEventHandler<E> getProxiedHandler()
   {
     return mHandler;
   }
@@ -49,9 +64,6 @@ public class TargetedHandler<E extends IEvent> implements IEventHandler<E>
   public boolean handleEvent(IEventDispatcher dispatcher, E event)
   {
     if (mSource != null && !mSource.equals(event.getSource()))
-      return false;
-    if (this == mHandler)
-      // we will not forward to ourselves
       return false;
     
     return mHandler.handleEvent(dispatcher, event);

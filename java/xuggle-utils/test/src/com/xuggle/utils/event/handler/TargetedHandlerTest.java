@@ -40,14 +40,14 @@ public class TargetedHandlerTest
   }
 
   @Test
-  public final void testGetTargetedHandler()
+  public final void testGetProxiedHandler()
   {
     IEventHandler<IEvent> targetedHandler =
       new MockNullEventHandler<IEvent>();
     Object source = new Object();
     TargetedHandler<IEvent> handler = 
       new TargetedHandler<IEvent>(source, targetedHandler);
-    assertEquals(targetedHandler, handler.getTargetedHandler());
+    assertEquals(targetedHandler, handler.getProxiedHandler());
   }
 
   @Test
@@ -71,7 +71,7 @@ public class TargetedHandlerTest
           return false;
         }};
     TargetedHandler<TestEvent> handler = 
-      new TargetedHandler<TestEvent>(source, targetedHandler);
+      Handlers.getTargetedHandler(source, targetedHandler);
     dispatcher.addEventHandler(0,
         TestEvent.class, handler);
     assertEquals(0, numCalls.get());
