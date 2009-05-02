@@ -71,7 +71,7 @@ public class TargetedHandlerTest
           return false;
         }};
     TargetedHandler<TestEvent> handler = 
-      Handlers.getTargetedHandler(source, targetedHandler);
+      Handler.getTargetedHandler(source, targetedHandler);
     dispatcher.addEventHandler(0,
         TestEvent.class, handler);
     assertEquals(0, numCalls.get());

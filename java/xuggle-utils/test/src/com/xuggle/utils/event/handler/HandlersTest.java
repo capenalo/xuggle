@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.xuggle.utils.event.Event;
 import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
-import com.xuggle.utils.event.RemoveEventHandlerEvent;
+import com.xuggle.utils.event.EventHandlerRemovedEvent;
 import com.xuggle.utils.event.SynchronousEventDispatcher;
 
 public class HandlersTest
@@ -30,7 +30,7 @@ public class HandlersTest
     TestEvent wrongEvent = new TestEvent(this);
 
     int maxCalls = 4;
-    IEventHandler<TestEvent> handler = Handlers.getTargetedAndBoundedHandler(
+    IEventHandler<TestEvent> handler = Handler.getTargetedAndBoundedHandler(
         source,
         maxCalls,
         new IEventHandler<TestEvent>(){
@@ -73,15 +73,15 @@ public class HandlersTest
     int maxCalls = 4;
 
     dispatcher.addEventHandler(0,
-        RemoveEventHandlerEvent.class,
-        new IEventHandler<RemoveEventHandlerEvent>(){
+        EventHandlerRemovedEvent.class,
+        new IEventHandler<EventHandlerRemovedEvent>(){
           public boolean handleEvent(IEventDispatcher dispatcher,
-              RemoveEventHandlerEvent event)
+              EventHandlerRemovedEvent event)
           {
             numRemoveHandler.incrementAndGet();
             return false;
           }});
-    Handlers.register(dispatcher,
+    Handler.register(dispatcher,
         0,
         TestEvent.class,
         source,

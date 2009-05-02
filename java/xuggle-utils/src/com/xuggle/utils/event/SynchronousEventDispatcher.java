@@ -100,8 +100,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    * Here's the data structure type
    * 
    *   A map of class names to:
-   *      A Map (because it can be sparse) of Priority to a list of Event Handlers
-   *        A list of event Handlers
+   *      A Map (because it can be sparse) of Priority to a list of Event Handler
+   *        A list of event Handler
    */
 
   private final Map<IEventHandler<? extends IEvent>,
@@ -181,7 +181,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     }
     
     // now outside the lock, communicate what just happened
-    dispatchEvent(new AddEventHandlerEvent(this, priority, eventClass, handler,
+    dispatchEvent(new EventHandlerAddedEvent(this, priority, eventClass, handler,
         useWeakReferences));
   }
 
@@ -318,7 +318,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       }
     }
     // now outside the lock, communicate what just happened
-    dispatchEvent(new RemoveEventHandlerEvent(this, priority, eventClass,
+    dispatchEvent(new EventHandlerRemovedEvent(this, priority, eventClass,
         null));
 
   }
@@ -401,7 +401,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       }
     }
     // now outside the lock, communicate what just happened
-    dispatchEvent(new RemoveEventHandlerEvent(this, priority, eventClass, handler));
+    dispatchEvent(new EventHandlerRemovedEvent(this, priority, eventClass, handler));
 
   }
 

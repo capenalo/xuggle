@@ -8,7 +8,7 @@ package com.xuggle.utils.event;
  *
  */
 
-public class AddEventHandlerEvent extends Event
+public class EventHandlerAddedEvent extends Event
 {
 
   private final int mPriority;
@@ -29,7 +29,7 @@ public class AddEventHandlerEvent extends Event
    *   only keeping a weak reference to this object.
    */
   
-  public AddEventHandlerEvent(IEventDispatcher source,
+  public EventHandlerAddedEvent(IEventDispatcher source,
       int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler,
