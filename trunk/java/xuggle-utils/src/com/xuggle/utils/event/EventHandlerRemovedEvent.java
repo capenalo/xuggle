@@ -48,7 +48,7 @@ import java.lang.ref.ReferenceQueue;
  *
  */
 
-public class RemoveEventHandlerEvent extends Event
+public class EventHandlerRemovedEvent extends Event
 {
 
   private final int mPriority;
@@ -67,7 +67,7 @@ public class RemoveEventHandlerEvent extends Event
    * @param handler The handler itself, or null if unknown.
    */
   
-  public RemoveEventHandlerEvent(IEventDispatcher source,
+  public EventHandlerRemovedEvent(IEventDispatcher source,
       int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler)

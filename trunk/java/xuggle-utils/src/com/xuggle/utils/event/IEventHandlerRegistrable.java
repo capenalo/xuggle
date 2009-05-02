@@ -37,7 +37,7 @@ public interface IEventHandlerRegistrable
    * 
    * <p>
    * 
-   * A successful add should result in a {@link AddEventHandlerEvent} being
+   * A successful add should result in a {@link EventHandlerAddedEvent} being
    * dispatched on the {@link IEventDispatcher} this {@link IEventHandler} was
    * added to.
    * 
@@ -79,7 +79,7 @@ public interface IEventHandlerRegistrable
    * 
    *  <p>
    * 
-   * A successful add should result in a {@link AddEventHandlerEvent} being
+   * A successful add should result in a {@link EventHandlerAddedEvent} being
    * dispatched on the {@link IEventDispatcher} this {@link IEventHandler} was
    * added to.
    * 
@@ -126,7 +126,7 @@ public interface IEventHandlerRegistrable
    * 
    * <p>
    * 
-   * A successful remove should result in a {@link RemoveEventHandlerEvent} being
+   * A successful remove should result in a {@link EventHandlerRemovedEvent} being
    * dispatched on the {@link IEventDispatcher} this {@link IEventHandler} was
    * removed from.
    * 

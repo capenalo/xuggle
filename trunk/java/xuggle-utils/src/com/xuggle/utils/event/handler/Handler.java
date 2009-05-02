@@ -6,7 +6,8 @@ import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.event.IEventHandlerRegistrable;
 
 /**
- * A collection of factory methods for special handlers.
+ * A collection of convenience methods for registering handlers and
+ * creating special handlers.
  * <p>
  * These are provided here because static generic function provide some
  * slight java compiler convenience.
@@ -15,9 +16,14 @@ import com.xuggle.utils.event.IEventHandlerRegistrable;
  *
  */
 
-public class Handlers
+public class Handler
 {
 
+  private Handler()
+  {
+    // no handlers for you!
+  }
+  
   /**
    * Get a new {@link ForwardingHandler}.
    * @param dispatcherToForwardTo dispatcher for returned handler

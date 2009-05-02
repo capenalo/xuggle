@@ -18,10 +18,10 @@
  * This class tries to provide some of those implementations for you.
  * </p>
  * <p>
- * Use the com.xuggle.utils.event.handler.Handlers class to find
+ * Use the com.xuggle.utils.event.handler.Handler class to find
  * Factory methods for the special handlers you want.
  * </p>
- * @see com.xuggle.utils.event.handler.Handlers
+ * @see com.xuggle.utils.event.handler.Handler
  * 
  */
 package com.xuggle.utils.event.handler;

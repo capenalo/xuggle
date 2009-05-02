@@ -21,7 +21,7 @@
 package com.xuggle.utils.event;
 
 /**
- * Handlers for events.
+ * Handler for events.
  * <p>
  * Classes that implement this interface can be added to an
  * IEventDispatcher.  

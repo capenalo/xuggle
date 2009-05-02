@@ -43,33 +43,4 @@ public abstract class Event implements IEvent
     return mNow;
   }
   
-  public static <T extends Event> void handleOnce(
-      final Class<T> eventClass,
-      final IEventHandlerRegistrable registry,
-      final Object source,
-      final int priority,
-      final IEventHandler<T> handler)
-  {
-    if (registry == null || priority < 0 || handler == null)
-      throw new IllegalArgumentException();
-    
-    registry.addEventHandler(priority,
-        eventClass,
-        new IEventHandler<T>()
-        {
-          public boolean handleEvent(IEventDispatcher dispatcher, T event)
-          {
-            if (source != null && !source.equals(event.getSource()))
-              return false;
-            // de-register ourselves
-            registry.removeEventHandler(0, 
-                eventClass, this);
-            // and call the handler
-            return handler.handleEvent(dispatcher, event);
-          }
-      
-        }
-    );
-  }
-
 }

@@ -414,34 +414,34 @@ public class SynchronousEventDispatcherTest
     final AtomicInteger numAdds = new AtomicInteger(0);
     final AtomicInteger numRemoves = new AtomicInteger(0);
 
-    IEventHandler<AddEventHandlerEvent> addHandler = 
-      new IEventHandler<AddEventHandlerEvent>(){
+    IEventHandler<EventHandlerAddedEvent> addHandler = 
+      new IEventHandler<EventHandlerAddedEvent>(){
       public boolean handleEvent(IEventDispatcher dispatcher,
-          AddEventHandlerEvent event)
+          EventHandlerAddedEvent event)
       {
         numAdds.incrementAndGet();
         return false;
       }
     };
-    IEventHandler<RemoveEventHandlerEvent> removeHandler =
-      new IEventHandler<RemoveEventHandlerEvent>(){
+    IEventHandler<EventHandlerRemovedEvent> removeHandler =
+      new IEventHandler<EventHandlerRemovedEvent>(){
 
         public boolean handleEvent(IEventDispatcher dispatcher,
-            RemoveEventHandlerEvent event)
+            EventHandlerRemovedEvent event)
         {
           numRemoves.incrementAndGet();
           return false;
         }};
       
-    dispatcher.addEventHandler(0, AddEventHandlerEvent.class,
+    dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
         addHandler
     );
-    dispatcher.addEventHandler(0, RemoveEventHandlerEvent.class,
+    dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
         removeHandler
     );
-    dispatcher.removeEventHandler(0, AddEventHandlerEvent.class,
+    dispatcher.removeEventHandler(0, EventHandlerAddedEvent.class,
         addHandler);
-    dispatcher.removeEventHandler(0, RemoveEventHandlerEvent.class,
+    dispatcher.removeEventHandler(0, EventHandlerRemovedEvent.class,
         removeHandler
     );
     assertEquals(2, numAdds.get());
@@ -464,18 +464,18 @@ public class SynchronousEventDispatcherTest
     final AtomicInteger numAddEventHandlers = new AtomicInteger(0);
     final AtomicInteger numRemoveEventHandlers = new AtomicInteger(0);
     final AtomicBoolean gotWeakReferenceCleanup = new AtomicBoolean(false);
-    dispatcher.addEventHandler(0, AddEventHandlerEvent.class,
-        new IEventHandler<AddEventHandlerEvent>(){
+    dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
+        new IEventHandler<EventHandlerAddedEvent>(){
           public boolean handleEvent(IEventDispatcher dispatcher,
-              AddEventHandlerEvent event)
+              EventHandlerAddedEvent event)
           {
             numAddEventHandlers.incrementAndGet();
             return false;
           }});
-    dispatcher.addEventHandler(0, RemoveEventHandlerEvent.class,
-        new IEventHandler<RemoveEventHandlerEvent>(){
+    dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
+        new IEventHandler<EventHandlerRemovedEvent>(){
           public boolean handleEvent(IEventDispatcher dispatcher,
-              RemoveEventHandlerEvent event)
+              EventHandlerRemovedEvent event)
           {
             numRemoveEventHandlers.incrementAndGet();
             assertNull("should only be called when removing weak reference",
