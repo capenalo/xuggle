@@ -1,6 +1,7 @@
 /**
- * Provides special implementations of
- * {@link com.xuggle.utils.event.IEventHandler}s.
+ * Provides convenience methods for registering, and
+ * special implementations of,
+ * {@link com.xuggle.utils.event.IEventHandler}.
  * <p>
  * There are certain types of {@link com.xuggle.utils.event.IEventHandler}
  * implementations that are very common.  For example, sometimes
@@ -18,7 +19,7 @@
  * This class tries to provide some of those implementations for you.
  * </p>
  * <p>
- * Use the com.xuggle.utils.event.handler.Handler class to find
+ * Use the {@link com.xuggle.utils.event.handler.Handler} class to find
  * Factory methods for the special handlers you want.
  * </p>
  * @see com.xuggle.utils.event.handler.Handler
