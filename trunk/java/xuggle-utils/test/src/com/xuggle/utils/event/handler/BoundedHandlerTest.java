@@ -22,29 +22,23 @@ public class BoundedHandlerTest
     try
     {
       new BoundedHandler<TestEvent>(
-          null,
           0,
-          TestEvent.class,
-          null,
-          -1);
+          new MockNullEventHandler<TestEvent>()
+          );
       fail("should not get here"); 
     }catch(IllegalArgumentException e){}
     try
     {
       new BoundedHandler<TestEvent>(
-          null,
-          0,
-          null,
-          new MockNullEventHandler<TestEvent>(),
-          -1);
+          1,
+          null
+          );
       fail("should not get here"); 
     }catch(IllegalArgumentException e){}
     new BoundedHandler<TestEvent>(
-        null,
-        0,
-        TestEvent.class,
-        new MockNullEventHandler<TestEvent>(),
-        -1);
+        1,
+        new MockNullEventHandler<TestEvent>()
+        );
   }
 
   @Test
@@ -56,13 +50,10 @@ public class BoundedHandlerTest
 
     int maxCalls = 4;
     BoundedHandler<TestEvent> handler = Handlers.getBoundedHandler(
-        dispatcher,
-        0,
-        TestEvent.class,
-        new MockNullEventHandler<TestEvent>(),
-        maxCalls
+        maxCalls,
+        new MockNullEventHandler<TestEvent>()
         );
-
+    dispatcher.addEventHandler(0, TestEvent.class, handler);
     for(int i = 0; i < maxCalls; i++)
     {
       assertEquals(i, handler.getNumTimesExecuted());
