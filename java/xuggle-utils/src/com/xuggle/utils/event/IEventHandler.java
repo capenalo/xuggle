@@ -40,6 +40,11 @@ public interface IEventHandler<E extends IEvent>
   /**
    * Any applicable events are passed to this
    * method for handling.
+   * <p>
+   * If this method throws any uncaught exceptions, then the
+   * calling {@link IEventDispatcher} will dispatch an {@link ErrorEvent}
+   * but will not re-throw the exception.
+   * </p>
    * 
    * @param dispatcher The dispatcher for this event
    * @param event The event this handler can handle
