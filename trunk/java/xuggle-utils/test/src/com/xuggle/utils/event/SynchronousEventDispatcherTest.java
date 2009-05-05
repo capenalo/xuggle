@@ -41,7 +41,7 @@ public class SynchronousEventDispatcherTest
 {
 
   private int mNumEventsHandled = 0;
-  
+
   @Before
   public void setUp()
   {
@@ -90,7 +90,7 @@ public class SynchronousEventDispatcherTest
     dispatcher.addEventHandler(0, clazz, handler);
     dispatcher.removeEventHandler(1, clazz, handler);
   }
-  
+
   @Test
   public void testDispatchEvent()
   {
@@ -118,7 +118,7 @@ public class SynchronousEventDispatcherTest
     assertTrue(event.mWasHandled);
     dispatcher.removeEventHandler(0, TestEvent.class, handler);
   }
-  
+
   @Test(timeout=5000)
   public void testStopDispatchingOnceOneHandlerHandles()
   {
@@ -157,7 +157,7 @@ public class SynchronousEventDispatcherTest
     dispatcher.dispatchEvent(event);
     assertTrue(event.mHandlerNo == 2);
   }
-  
+
   @Test
   public void testHandlerForParentClassesNotCalledForSubEvents()
   {
@@ -199,7 +199,7 @@ public class SynchronousEventDispatcherTest
 
     assertTrue(mNumEventsHandled == 3);
   }
-  
+
   @Test
   public void testDispatchFromHandlerIsDeferred()
   {
@@ -213,7 +213,7 @@ public class SynchronousEventDispatcherTest
       public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
       {
         TestEvent ev = (TestEvent) event;
-        
+
         // Cache the value BEFORE we call another dispatchEvent
         int numDispatches = ev.mNumDispatches;
 
@@ -238,7 +238,7 @@ public class SynchronousEventDispatcherTest
     assertTrue(dispatcher != null);
 
     dispatcher.addEventHandler(0, TestEvent.class, handler);
-    
+
     TestEvent event = new TestEvent();
     assertTrue(event.mNumDispatches == 0);
     dispatcher.dispatchEvent(event);
@@ -246,7 +246,7 @@ public class SynchronousEventDispatcherTest
     // before returning from above
     assertTrue(event.mNumDispatches == 2);    
   }
-  
+
   @Test
   public void testEventHandlerCanRemoveEventHandler()
   {
@@ -262,7 +262,7 @@ public class SynchronousEventDispatcherTest
     };
     class TestEventHandler implements IEventHandler<TestEvent>
     {
-      
+
       public boolean handleEvent(IEventDispatcher aDispatcher, TestEvent aEvent)
       {
         aDispatcher.removeEventHandler(0, TestEvent.class, this);
@@ -296,19 +296,19 @@ public class SynchronousEventDispatcherTest
     dispatcher.addEventHandler(0, clazz, handler);
     // This should fail
     dispatcher.removeEventHandler(0, clazz, new IEventHandler<IEvent>(){
-      
+
       public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
       {
-       return false;
+        return false;
       }
-      
+
     });
   }
   @Test
   public void testEventCalledBeforeRemovalAndNotAfterwards()
   {
     AtomicInteger numCalls = new AtomicInteger(0);
-    
+
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     assertTrue(dispatcher != null);
 
@@ -326,7 +326,7 @@ public class SynchronousEventDispatcherTest
       {
         mCount = count;
       }
-      
+
       public boolean handleEvent(IEventDispatcher aDispatcher, TestEvent aEvent)
       {
         mCount.incrementAndGet();
@@ -348,36 +348,56 @@ public class SynchronousEventDispatcherTest
    * dispatching
    * 
    */
-  
-  @Test(expected=ClassCastException.class)
+
   public void testAddEventHandlerOfWrongType()
   {
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+
     class TestEvent extends Event
     {
       @SuppressWarnings("unused")
       public TestEvent(Object source) { super(source); }
     }
-    IEventHandler<TestEvent> wrongHandler = new IEventHandler<TestEvent>(){
-
+    final IEventHandler<TestEvent> wrongHandler = new IEventHandler<TestEvent>()
+    {
       public boolean handleEvent(IEventDispatcher dispatcher, TestEvent event)
       {
         // should never get called
         fail("shouldn't be here");
         return false;
-      }};
-      IEvent wrongEvent = new Event(this){};
-      dispatcher.addEventHandler(0, wrongEvent.getClass(), wrongHandler);
-      dispatcher.dispatchEvent(wrongEvent);
+      }
+    };
+    final AtomicBoolean testPassed = new AtomicBoolean(false);
+    // NOTICE THIS IS NOT OF THE TYPE TestEvent; That's the test
+    final IEvent wrongEvent = new Event(this){};
+    dispatcher.addEventHandler(0,
+        ErrorEvent.class,
+        new IEventHandler<ErrorEvent>(){
+      public boolean handleEvent(IEventDispatcher dispatcher,
+          ErrorEvent event)
+      {
+        Throwable t = event.getException();
+        assertNotNull(t);
+        assertTrue(t instanceof ClassCastException);
+        assertEquals(wrongEvent, event.getEvent());
+        assertEquals(wrongHandler, event.getHandler());
+        testPassed.set(true);
+        return false;
+      }}
+    );
+
+    dispatcher.addEventHandler(0, wrongEvent.getClass(), wrongHandler);
+    dispatcher.dispatchEvent(wrongEvent);
+    assertTrue(testPassed.get());
   }
-  
+
   @Test
   public void testAddEventHandlersHappenImmediately()
   {
     final IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     final Mutable<Boolean> gotFirstEvent = new Mutable<Boolean>(false);
     final Mutable<Boolean> gotSecondEvent = new Mutable<Boolean>(false);
-    
+
     final ISelfHandlingEvent<IEvent> firstEvent =
       new SelfHandlingEvent<IEvent>(this){
       @Override
@@ -390,14 +410,14 @@ public class SynchronousEventDispatcherTest
         dispatcher.dispatchEvent(secondEvent);
         dispatcher.addEventHandler(0, secondEvent.getClass(), 
             new IEventHandler<IEvent>(){
-              public boolean handleEvent(IEventDispatcher dispatcher,
-                  IEvent event)
-              {
-                assertTrue(gotFirstEvent.get());
-                gotSecondEvent.set(true);
-                dispatcher.removeEventHandler(0, event.getClass(), this);
-                return false;
-              }});
+          public boolean handleEvent(IEventDispatcher dispatcher,
+              IEvent event)
+          {
+            assertTrue(gotFirstEvent.get());
+            gotSecondEvent.set(true);
+            dispatcher.removeEventHandler(0, event.getClass(), this);
+            return false;
+          }});
         gotFirstEvent.set(true);
         return false;
       }};
@@ -410,7 +430,7 @@ public class SynchronousEventDispatcherTest
   public void testAddAndRemoveEventHandlersFireCorrectEvents()
   {
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
-    
+
     final AtomicInteger numAdds = new AtomicInteger(0);
     final AtomicInteger numRemoves = new AtomicInteger(0);
 
@@ -426,33 +446,33 @@ public class SynchronousEventDispatcherTest
     IEventHandler<EventHandlerRemovedEvent> removeHandler =
       new IEventHandler<EventHandlerRemovedEvent>(){
 
-        public boolean handleEvent(IEventDispatcher dispatcher,
-            EventHandlerRemovedEvent event)
-        {
-          numRemoves.incrementAndGet();
-          return false;
-        }};
-      
-    dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
-        addHandler
-    );
-    dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
-        removeHandler
-    );
-    dispatcher.removeEventHandler(0, EventHandlerAddedEvent.class,
-        addHandler);
-    dispatcher.removeEventHandler(0, EventHandlerRemovedEvent.class,
-        removeHandler
-    );
-    assertEquals(2, numAdds.get());
-    assertEquals(1, numRemoves.get()); // shouldn't get the last remove
+      public boolean handleEvent(IEventDispatcher dispatcher,
+          EventHandlerRemovedEvent event)
+      {
+        numRemoves.incrementAndGet();
+        return false;
+      }};
+
+      dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
+          addHandler
+      );
+      dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
+          removeHandler
+      );
+      dispatcher.removeEventHandler(0, EventHandlerAddedEvent.class,
+          addHandler);
+      dispatcher.removeEventHandler(0, EventHandlerRemovedEvent.class,
+          removeHandler
+      );
+      assertEquals(2, numAdds.get());
+      assertEquals(1, numRemoves.get()); // shouldn't get the last remove
   }
   /**
    * This test can take a LONG time to execute; it requires the
    * Java garbage collector to collect a reference, hence the
    * long timeout for slow machines. 
    */
-  
+
   @Test(timeout=1000*60*5) // 5 minute timeout.
   public void testAddEventHandlerWeakReference()
   {
@@ -460,48 +480,48 @@ public class SynchronousEventDispatcherTest
       public TestEvent(Object source) { super(source); }
     }
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
-    
+
     final AtomicInteger numAddEventHandlers = new AtomicInteger(0);
     final AtomicInteger numRemoveEventHandlers = new AtomicInteger(0);
     final AtomicBoolean gotWeakReferenceCleanup = new AtomicBoolean(false);
     dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
         new IEventHandler<EventHandlerAddedEvent>(){
-          public boolean handleEvent(IEventDispatcher dispatcher,
-              EventHandlerAddedEvent event)
-          {
-            numAddEventHandlers.incrementAndGet();
-            return false;
-          }});
+      public boolean handleEvent(IEventDispatcher dispatcher,
+          EventHandlerAddedEvent event)
+      {
+        numAddEventHandlers.incrementAndGet();
+        return false;
+      }});
     dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
         new IEventHandler<EventHandlerRemovedEvent>(){
-          public boolean handleEvent(IEventDispatcher dispatcher,
-              EventHandlerRemovedEvent event)
-          {
-            numRemoveEventHandlers.incrementAndGet();
-            assertNull("should only be called when removing weak reference",
-                event.getHandler());
-            gotWeakReferenceCleanup.getAndSet(true);
-            return false;
-          }});
-    
-    
+      public boolean handleEvent(IEventDispatcher dispatcher,
+          EventHandlerRemovedEvent event)
+      {
+        numRemoveEventHandlers.incrementAndGet();
+        assertNull("should only be called when removing weak reference",
+            event.getHandler());
+        gotWeakReferenceCleanup.getAndSet(true);
+        return false;
+      }});
+
+
     {
       // must be different scope
       IEventHandler<IEvent> weakHandler =
         new IEventHandler<IEvent>()
         {
-          public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
-          {
-            return false;
-          }
-        
+        public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+        {
+          return false;
+        }
+
         };
-      // add with a weak reference
-      dispatcher.addEventHandler(0, TestEvent.class, weakHandler, true);
-      // for shits and giggles do one dispatch
-      dispatcher.dispatchEvent(new TestEvent(this));
-      // kill the reference here
-      weakHandler = null;
+        // add with a weak reference
+        dispatcher.addEventHandler(0, TestEvent.class, weakHandler, true);
+        // for shits and giggles do one dispatch
+        dispatcher.dispatchEvent(new TestEvent(this));
+        // kill the reference here
+        weakHandler = null;
     }
     while(!gotWeakReferenceCleanup.get())
     {
