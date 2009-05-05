@@ -135,30 +135,55 @@ public class ErrorEvent extends Event
     return mMessage;
   }
   
+  /**
+   *
+   * Returns the error event with a summary of information that might
+   * be useful for inserting in a log.
+   * <p>
+   * We will print the first five frames of the stack trace if an
+   * exception is available.
+   * </p>
+   * 
+   * @return a string
+   */
+  
   @Override
   public String toString()
   {
-    Throwable t = getException();
-    StringBuilder string = new StringBuilder();
+    final StringBuilder string = new StringBuilder();
     string.append(super.toString());
     string.append("[");
     string.append("source="+getSource()+";");
-    string.append("message="+getMessage()+";");
-    string.append("exception="+t+";");
+    final String message = getMessage();
+    if (message != null && message.length()>0)
+      string.append("message="+message+";");
+    final IEvent event = getEvent();
+    if (event != null)
+      string.append("event="+event+";");
+    final IEventHandler<? extends IEvent> handler = getHandler();
+    if (handler!=null)
+      string.append("handler="+handler+";");
+    
+    final Throwable t = getException();
     if (t != null)
     {
+      string.append("exception="+t+";");
       StackTraceElement[] elements=t.getStackTrace();
-      string.append("stack trace=");
-      int i = 0;
-      string.append("[\n");
-      for(StackTraceElement elem : elements)
+      if (elements != null && elements.length>0)
       {
-        string.append("frame=" + elem.toString() +";\n");
-        ++i;
-        if (i >= 5)
-          break;
+        string.append("stack trace=");
+
+        int i = 0;
+        string.append("[\n");
+        for(StackTraceElement elem : elements)
+        {
+          string.append("frame=" + elem.toString() +";\n");
+          ++i;
+          if (i >= 5)
+            break;
+        }
+        string.append("];");
       }
-      string.append("]");
     }
     string.append("]");
     return string.toString();
@@ -178,6 +203,11 @@ public class ErrorEvent extends Event
   /**
    * The handler that the exception was thrown from, or null
    * if unknown.
+   * <p>
+   * If {@link #getException()} is an uncaught exception
+   * encountered when processing an {@link IEventHandler}, then
+   * this method returns the handler that failed to catch the exception.
+   * </p>
    * 
    * @return the handler
    */
@@ -187,6 +217,14 @@ public class ErrorEvent extends Event
     return mHandler;
   }
 
+  /**
+   * The {@link IEvent} that was being handled when the error occurred.
+   * <p>
+   * If this error event was generated because of an uncaught exception
+   * in an {@link IEventHandler}, then this method returns that event.
+   * </p> 
+   * @return the event.
+   */
   public IEvent getEvent()
   {
     return mEvent;
