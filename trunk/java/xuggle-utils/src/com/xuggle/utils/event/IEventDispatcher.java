@@ -33,6 +33,14 @@ package com.xuggle.utils.event;
  * 
  *   <li> Find all appropriate handlers, and call them, stopping
  *      when a handler has successfully handled the event.</li>
+ *   <li> If any handler throws an uncaught Exception, we will
+ *      dispatch an {@link ErrorEvent} and continue with the
+ *      next handler</li>
+ *   <li> If the thread a dispatcher is running on is interrupted,
+ *      we will return from the current dispatch loop.</li>
+ *   <li>If a handler attempts to dispatch an event on the same
+ *      dispatcher it is being run from, the new event is queued
+ *      until the current handler returns</li>
  * 
  * </ol>
  * 
