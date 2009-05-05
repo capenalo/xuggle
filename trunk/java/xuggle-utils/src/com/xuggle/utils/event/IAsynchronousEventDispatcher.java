@@ -29,12 +29,14 @@ public interface IAsynchronousEventDispatcher extends IEventDispatcher
   /**
    * Start a dispatcher running.
    */
+  
   public abstract void startDispatching();
 
   /**
    * If running a dispatcher in a separate thread, this will
    * tell that thread to stop running.
    */
+  
   public abstract void stopDispatching();
 
   /**
@@ -44,8 +46,14 @@ public interface IAsynchronousEventDispatcher extends IEventDispatcher
    * @param timeout Time, in milliseconds, to wait for the dispatcher
    *   thread to finish.  0 means wait indefinitely.
    */
+  
   public abstract void waitForDispatcherToFinish(long timeout);
 
+  /**
+   * Is the dispatcher thread currently running?
+   * 
+   * @return true if the dispatcher is running; false otherwise.
+   */
   public abstract boolean isDispatching();
 
 }
