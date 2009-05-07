@@ -246,7 +246,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
             }
           }
         }
-        //log.debug("Handling event: {} with {} handlers", event, handlers.size());
+        log.trace("Handling event: {} with {} handlers", event, handlers.size());
         Iterator<IEventHandler<? extends IEvent>> handlersIter = handlers.iterator();
         while(!Thread.interrupted() && 
             !eventHandled &&
