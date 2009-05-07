@@ -140,7 +140,7 @@ public class ErrorEvent extends Event
    * Returns the error event with a summary of information that might
    * be useful for inserting in a log.
    * <p>
-   * We will print the first five frames of the stack trace if an
+   * We will print the first fifteen frames of the stack trace if an
    * exception is available.
    * </p>
    * 
@@ -171,18 +171,17 @@ public class ErrorEvent extends Event
       StackTraceElement[] elements=t.getStackTrace();
       if (elements != null && elements.length>0)
       {
-        string.append("stack trace=");
+        string.append("stack trace=\n");
 
         int i = 0;
-        string.append("[\n");
         for(StackTraceElement elem : elements)
         {
-          string.append("frame=" + elem.toString() +";\n");
+          string.append(elem.toString() +"\n");
           ++i;
-          if (i >= 5)
+          if (i >= 15)
             break;
         }
-        string.append("];");
+        string.append(";");
       }
     }
     string.append("]");
