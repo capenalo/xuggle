@@ -25,6 +25,7 @@ import java.util.TimerTask;
 
 import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.adapter.MultiThreadedApplicationAdapter;
+import org.red5.server.api.Red5;
 import org.red5.server.api.stream.IBroadcastStream;
 import org.slf4j.Logger;
 
@@ -112,14 +113,16 @@ public class VideoTranscoderDemoAdapter extends MultiThreadedApplicationAdapter
   public void streamPublishStart(IBroadcastStream stream) {
     log.debug("streamPublishStart: {}; {}", stream, stream.getPublishedName());
     super.streamPublishStart(stream);
-    resamplerDemo.startTranscodingStream(stream, this.getScope());
+    resamplerDemo.startTranscodingStream(stream,
+        Red5.getConnectionLocal().getScope());
   }
   
   @Override
   public void streamBroadcastClose(IBroadcastStream stream) {
     log.debug("streamBroadcastClose: {}; {}", stream, stream.getPublishedName());
     
-    resamplerDemo.stopTranscodingStream(stream, this.getScope());
+    resamplerDemo.stopTranscodingStream(stream,
+        Red5.getConnectionLocal().getScope());
     super.streamBroadcastClose(stream);
   }
 
