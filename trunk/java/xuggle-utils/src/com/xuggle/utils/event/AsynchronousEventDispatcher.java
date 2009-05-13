@@ -131,6 +131,7 @@ implements IAsynchronousEventDispatcher
 
     synchronized(this)
     {
+      log.trace("dispatchEvent({})", event);
       // we need to queue the event.
       if (event instanceof EventDispatcherAbortEvent)
       {
@@ -151,10 +152,12 @@ implements IAsynchronousEventDispatcher
     while (keepRunning)
     {
       IEvent event = null;
+      int numPendingEvents = 0;
       while(event == null)
       {
         synchronized(this)
         {
+          numPendingEvents = mEventQueue.size();
           event = mEventQueue.poll();
           if (event == null)
           {
@@ -185,6 +188,8 @@ implements IAsynchronousEventDispatcher
       } else {
         try
         {
+          log.trace("pending events: {}; dispatchEvent({})", numPendingEvents,
+              event);
           super.dispatchEvent(event);
         } catch (Throwable t)
         {

@@ -148,12 +148,10 @@ public class ErrorEvent extends Event
    */
   
   @Override
-  public String toString()
+  public String getDescription()
   {
     final StringBuilder string = new StringBuilder();
-    string.append(super.toString());
-    string.append("[");
-    string.append("source="+getSource()+";");
+    string.append(super.getDescription());
     final String message = getMessage();
     if (message != null && message.length()>0)
       string.append("message="+message+";");
@@ -184,7 +182,6 @@ public class ErrorEvent extends Event
         string.append(";");
       }
     }
-    string.append("]");
     return string.toString();
   }
 
