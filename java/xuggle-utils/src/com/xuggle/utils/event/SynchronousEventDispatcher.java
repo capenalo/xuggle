@@ -258,6 +258,16 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           try {
             eventHandled = handler.handleEvent(this, event);
           }
+          catch (AssertionError t) {
+            // to enable tests to continue working, we dispatch an event but
+            // rethrow.
+            dispatchEvent(new ErrorEvent(event.getSource(),
+                t,
+                "uncaught exception",
+                event,
+                handler));
+            throw t;
+          }
           catch (Throwable t)
           {
             dispatchEvent(new ErrorEvent(event.getSource(),
