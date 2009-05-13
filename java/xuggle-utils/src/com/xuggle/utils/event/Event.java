@@ -43,4 +43,29 @@ public abstract class Event implements IEvent
     return mNow;
   }
   
+  /**
+   * Override this method and describe your event.  Make sure
+   * you call your super.getDescription() and you'll get nicely
+   * formatted event strings.
+   * 
+   * @return a description of your event of the form "field=value;field=value;"
+   */
+  public String getDescription()
+  {
+    StringBuilder builder = new StringBuilder();
+    builder.append("source=").append(getSource()).append(";");
+    builder.append("when=").append(getWhen()).append(";");
+    return builder.toString();
+  }
+  
+  @Override
+  public final String toString()
+  {
+    StringBuilder builder = new StringBuilder();
+    builder.append(super.toString());
+    builder.append("[");
+    builder.append(getDescription());
+    builder.append("]");
+    return builder.toString();
+  }
 }
