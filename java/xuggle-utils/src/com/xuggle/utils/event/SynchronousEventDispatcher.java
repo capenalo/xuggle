@@ -193,6 +193,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       if (event == null)
         throw new IllegalArgumentException("cannot dispatch null event");
       
+      event.preDispatch(this);
+      
       //log.debug("dispatching event: {}", event);
       mPendingEventDispatches.add(event);
       // don't process a dispatch if nested within a dispatchEvent() call;
@@ -277,6 +279,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           }
         }
         //log.debug("Handling event: {} done", event);
+        if (event.postHandle(this) <= 0)
+          event.delete();
         
         // and finish by checking our reference queue and removing any event
         // handlers that are now dead.

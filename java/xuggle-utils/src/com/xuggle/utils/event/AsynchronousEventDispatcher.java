@@ -128,18 +128,26 @@ implements IAsynchronousEventDispatcher
     if (event == null)
       return;
 
+    event.preDispatch(this);
+    
     synchronized(this)
     {
       log.trace("dispatchEvent({})", event);
       // we need to queue the event.
       if (event instanceof EventDispatcherAbortEvent)
       {
+        // clear out the queue and then add abort
+        IEvent queueEvent;
+        while((queueEvent = mEventQueue.poll()) != null)
+        {
+          if (queueEvent.postHandle(this) <= 0)
+            queueEvent.delete();
+        }
         // Abort always jumps to the front of the queue
         log.debug("aborting dispatcher");
-        mEventQueue.addFirst(event);
-      } else {
-        mEventQueue.addLast(event);
       }
+      mEventQueue.offer(event);
+      
       // and let the dispatch thread know
       this.notifyAll();
     }
@@ -189,7 +197,15 @@ implements IAsynchronousEventDispatcher
         {
           log.trace("pending events: {}; dispatchEvent({})", numPendingEvents,
               event);
-          super.dispatchEvent(event);
+          try
+          {
+            super.dispatchEvent(event);
+          }
+          finally
+          {
+            if (event.postHandle(this) <= 0)
+              event.delete();
+          }
         } catch (Throwable t)
         {
           log.error("Dispatcher continuing after unhandled event: {}",

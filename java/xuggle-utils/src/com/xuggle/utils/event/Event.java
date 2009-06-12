@@ -19,6 +19,8 @@
 
 package com.xuggle.utils.event;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * A base implementation of an Event.  Can be handy to extend from.
  */
@@ -27,11 +29,13 @@ public abstract class Event implements IEvent
 
   private final Object mSource;
   private final long mNow;
+  private final AtomicLong mRefCount;
 
   public Event(Object aSource)
   {
     mSource = aSource;
     mNow = System.nanoTime();
+    mRefCount = new AtomicLong(0);
   }
   public Object getSource()
   {
@@ -90,4 +94,30 @@ public abstract class Event implements IEvent
     builder.append("]");
     return builder.toString();
   }
+
+  /**
+   * {@inheritDoc}
+   */
+
+  public long preDispatch(IEventDispatcher dispatcher)
+  {
+    return mRefCount.incrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}.  Defaults to empty.
+   */
+  public void delete()
+  {
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+
+  public long postHandle(IEventDispatcher dispatcher)
+  {
+    return mRefCount.decrementAndGet();
+  }
+
 }
