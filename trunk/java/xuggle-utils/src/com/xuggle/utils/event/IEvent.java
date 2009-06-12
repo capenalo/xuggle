@@ -57,4 +57,30 @@ public interface IEvent
    */
   long getWhen();
 
+  /**
+   * Called internally by dispatchers right before a {@link IEventDispatcher#dispatchEvent(IEvent)}
+   * is attempted.
+   * @param dispatcher the dispatcher added to.
+   * @return should return the total number of {@link #preDispatch(IEventDispatcher)}
+   *   calls - the total number of {@link #postHandle(IEventDispatcher)} calls.
+   */
+  long preDispatch(IEventDispatcher dispatcher);
+  
+  /**
+   * Called by the {@link IEventDispatcher} when all handlers
+   * for this event have been called during the dispatch cycle.
+   * If this method returns 0, the {@link IEventDispatcher} will
+   * call {@link #delete()} on this event.
+   * @param dispatcher
+   * @return should return the total number of {@link #preDispatch(IEventDispatcher)}
+   *   calls - the total number of {@link #postHandle(IEventDispatcher)} calls.
+   */
+  long postHandle(IEventDispatcher dispatcher);
+  
+  /**
+   * A method that is called when all dispatched events have finished
+   * being handled.
+   */
+  void delete();
+
 }

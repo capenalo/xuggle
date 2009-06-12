@@ -20,6 +20,11 @@
 package com.xuggle.utils.event;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 import com.xuggle.utils.Mutable;
@@ -296,5 +301,109 @@ public class AsynchronousEventDispatcherTest
     assertTrue("should execute AFTER the secondEvent", 
         testSucceeded.get());
     
+  }
+  
+  @Test(timeout=2000)
+  public void testDeleteIsCalledWhenDispatchFinished()
+  {
+    final AtomicBoolean deleteCalled = new AtomicBoolean(false);
+    final IEvent event = new Event(this){
+      @Override
+      public void delete()
+      {
+        deleteCalled.set(true);
+      }
+    };
+    final IAsynchronousEventDispatcher dispatcher =
+      new AsynchronousEventDispatcher();
+    assertFalse(deleteCalled.get());
+    dispatcher.startDispatching();
+    dispatcher.dispatchEvent(event);
+    dispatcher.stopDispatching();
+    dispatcher.waitForDispatcherToFinish(0);
+    assertTrue(deleteCalled.get());
+  }
+
+  @Test(timeout=2000)
+  public void testDeleteIsCalledAfterAllDispatches()
+  {
+    final AtomicLong numDeletes = new AtomicLong(0);
+    final AtomicLong numDispatches = new AtomicLong(0);
+    final long totalDispatches = 5;
+    final IEvent event = new SelfHandlingEvent<IEvent>(this){
+
+      @Override
+      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+      {
+        if(numDispatches.incrementAndGet() < totalDispatches)
+          dispatcher.dispatchEvent(this);
+        else
+          ((IAsynchronousEventDispatcher)dispatcher).stopDispatching();
+        return false;
+      }
+      
+      @Override
+      public void delete()
+      {
+        numDeletes.incrementAndGet();
+      }
+    };
+    final IAsynchronousEventDispatcher dispatcher =
+      new AsynchronousEventDispatcher();
+    assertEquals(0, numDeletes.get());
+    assertEquals(0, numDispatches.get());
+    dispatcher.startDispatching();
+    dispatcher.dispatchEvent(event);
+    dispatcher.waitForDispatcherToFinish(0);
+    assertEquals(1, numDeletes.get());
+    assertEquals(totalDispatches, numDispatches.get());
+    
+  }
+  
+  @Test(timeout=2000)
+  public void testDeleteCalledWhenAborted()
+  {
+    final AtomicLong numDeletes = new AtomicLong(0);
+    final AtomicLong numHandles = new AtomicLong(0);
+    final long totalDispatches = 5;
+    final IEvent deletingEvent = new SelfHandlingEvent<IEvent>(this){
+      @Override
+      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+      {
+        numHandles.incrementAndGet();
+        return false;
+      }
+      @Override
+      public void delete()
+      {
+        numDeletes.incrementAndGet();
+      }
+
+    };
+    final IEvent testEvent= new SelfHandlingEvent<IEvent>(this)
+    {
+      @Override
+      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+      {
+        // Queue up a bunch of our test events, and then
+        // abort
+        for(int i = 0; i < totalDispatches; i++)
+          dispatcher.dispatchEvent(deletingEvent);
+        dispatcher.dispatchEvent(new EventDispatcherAbortEvent(this));
+        return false;
+      }
+      
+    };
+    final IAsynchronousEventDispatcher dispatcher =
+      new AsynchronousEventDispatcher();
+    assertEquals(0, numDeletes.get());
+    assertEquals(0, numHandles.get());
+    
+    // we queue up a bunch of events
+    dispatcher.startDispatching();
+    dispatcher.dispatchEvent(testEvent);
+    dispatcher.waitForDispatcherToFinish(0);
+    assertEquals(0, numHandles.get());
+    assertEquals(1, numDeletes.get());
   }
 }

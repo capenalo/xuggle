@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 import com.xuggle.utils.Mutable;
@@ -529,5 +530,53 @@ public class SynchronousEventDispatcherTest
     }
     assertEquals(3, numAddEventHandlers.get());
     assertEquals(1, numRemoveEventHandlers.get());
+  }
+  
+  @Test
+  public void testDeleteIsCalledWhenDispatchFinished()
+  {
+    final AtomicBoolean deleteCalled = new AtomicBoolean(false);
+    final IEvent event = new Event(this){
+      @Override
+      public void delete()
+      {
+        deleteCalled.set(true);
+      }
+    };
+    final IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+    assertFalse(deleteCalled.get());
+    dispatcher.dispatchEvent(event);
+    assertTrue(deleteCalled.get());
+  }
+
+  @Test
+  public void testDeleteIsCalledAfterAllDispatches()
+  {
+    final AtomicLong numDeletes = new AtomicLong(0);
+    final AtomicLong numDispatches = new AtomicLong(0);
+    final long totalDispatches = 5;
+    final IEvent event = new SelfHandlingEvent<IEvent>(this){
+
+      @Override
+      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
+      {
+        if(numDispatches.incrementAndGet() < totalDispatches)
+          dispatcher.dispatchEvent(this);
+        return false;
+      }
+      
+      @Override
+      public void delete()
+      {
+        numDeletes.incrementAndGet();
+      }
+    };
+    final IEventDispatcher dispatcher = new SynchronousEventDispatcher();
+    assertEquals(0, numDeletes.get());
+    assertEquals(0, numDispatches.get());
+    dispatcher.dispatchEvent(event);
+    assertEquals(1, numDeletes.get());
+    assertEquals(totalDispatches, numDispatches.get());
+    
   }
 }
