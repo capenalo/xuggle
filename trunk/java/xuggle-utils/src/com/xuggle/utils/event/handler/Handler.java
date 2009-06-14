@@ -176,6 +176,9 @@ public class Handler
                 targetedHandler);
           } catch (IndexOutOfBoundsException e) {
             // if someone has already removed us, ignore it.
+            do {
+              
+            } while(false);
           }
           return false;
         }}
