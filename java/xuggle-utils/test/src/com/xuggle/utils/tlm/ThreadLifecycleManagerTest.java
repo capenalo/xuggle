@@ -136,7 +136,7 @@ public class ThreadLifecycleManagerTest
    * stop it.
    * @throws InterruptedException Well, really it should fail it we do...
    */
-  @Test(timeout=1000)
+  @Test(timeout=10000)
   public void testSimpleStartStop() throws InterruptedException
   {
     IThreadLifecycleManager mgr = null;
@@ -213,7 +213,7 @@ public class ThreadLifecycleManagerTest
    * 
    * @throws InterruptedException Well, really it should fail it we do...
    */
-  @Test(timeout=1000)
+  @Test(timeout=10000)
   public void testSimplerStartStop() throws InterruptedException
   {
     IThreadLifecycleManager mgr = null;
