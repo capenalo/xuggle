@@ -340,7 +340,7 @@ public class Red5Handler implements IURLProtocolHandler
       {
         // we don't yet have enough data to parse the header, but
         // let's return for now and fix on a later call to write.
-
+        do {} while(false);
       }
     }
 
@@ -716,7 +716,7 @@ public class Red5Handler implements IURLProtocolHandler
         if (mStreamInfo.isAudioChannelsKnown())
         {
           boolean value = mStreamInfo.getAudioChannels()!=1;
-          addMetaData(params, "stereo", new Boolean(value));
+          addMetaData(params, "stereo", Boolean.valueOf(value));
         }
         if (mStreamInfo.isAudioSampleRateKnown())
         {
@@ -791,7 +791,8 @@ public class Red5Handler implements IURLProtocolHandler
           addMetaData(params, "framerate", new Double(value));
         }
         ICodec.ID vidCodec = mStreamInfo.getVideoCodec();
-        if (vidCodec != null || vidCodec != ICodec.ID.CODEC_ID_NONE)
+        if (vidCodec != null &&
+            vidCodec != ICodec.ID.CODEC_ID_NONE)
         {
           int flvCodecID = 2;
           switch(vidCodec)
@@ -821,12 +822,12 @@ public class Red5Handler implements IURLProtocolHandler
       ITimeValue duration = mStreamInfo.getDuration();
       if (duration != null)
       {
-        double value = (double)duration.get(ITimeValue.Unit.MILLISECONDS) / 1000.0;
+        double value = duration.get(ITimeValue.Unit.MILLISECONDS) / 1000.0;
         addMetaData(params, "duration", new Double(value));
       }
 
       // hey by default we're NON seekable streams; deal with it.
-      addMetaData(params, "canSeekToEnd", new Boolean(false));
+      addMetaData(params, "canSeekToEnd", Boolean.FALSE);
 
       IoBuffer amfData = IoBuffer.allocate(1024);
       amfData.setAutoExpand(true);

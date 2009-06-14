@@ -23,7 +23,7 @@
     <dependency org="xuggle"
       name="xuggle-xuggler"
       conf="compile, test"
-      rev="latest.integration"/>
+      rev="[3.0,)"/>
 
     <!-- Logging --> 
     <dependency org="red5" name="slf4j-api" conf="compile, test" rev="1.5.6" />
