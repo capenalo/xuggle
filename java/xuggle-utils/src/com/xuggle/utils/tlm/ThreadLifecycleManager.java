@@ -247,13 +247,10 @@ public class ThreadLifecycleManager extends StateMachine
   public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
   {
     boolean result = false;
-    if (event.getSource() == this)
-    {
-      if (event instanceof InternalEvent)
-        // self handling events to make the code a little
-        // easier to edit
-        result = ((InternalEvent)event).handleEvent(dispatcher, event);
-    }
+    if (event instanceof InternalEvent)
+      // self handling events to make the code a little
+      // easier to edit
+      result = ((InternalEvent)event).handleEvent(dispatcher, event);
 
     return result;
   }

@@ -36,20 +36,16 @@ public class TestUtils
   public static String getNameOfCallingMethod()
   {
     try {
-      try {
-        throw new RuntimeException();
-      }
-      catch(RuntimeException e)
+      throw new RuntimeException();
+    }
+    catch(RuntimeException e)
+    {
+      e.fillInStackTrace();
+      StackTraceElement[] elements = e.getStackTrace();
+      if (elements != null && elements.length > 2)
       {
-        e.fillInStackTrace();
-        StackTraceElement[] elements = e.getStackTrace();
-        if (elements != null && elements.length > 2)
-        {
-          return elements[1].getMethodName();
-        }
+        return elements[1].getMethodName();
       }
-    } catch (Throwable t) {
-      // make sure we don't let any other errors trip us up
     }
     return "unknownMethod"+UUID.randomUUID().toString(); 
   }
