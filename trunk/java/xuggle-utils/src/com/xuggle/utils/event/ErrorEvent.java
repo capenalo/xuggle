@@ -65,6 +65,8 @@ public class ErrorEvent extends Event
     mException = t;
     mHandler = handler;
     mEvent = event;
+    if (mEvent != null)
+      mEvent.acquire();
     log.info("Error: {}", this);
   }
 
@@ -245,4 +247,9 @@ public class ErrorEvent extends Event
     return mEvent;
   }
 
+  public void delete()
+  {
+    if (mEvent != null)
+      mEvent.release();
+  }
 }

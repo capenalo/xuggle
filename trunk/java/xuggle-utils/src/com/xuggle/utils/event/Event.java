@@ -99,25 +99,32 @@ public abstract class Event implements IEvent
    * {@inheritDoc}
    */
 
-  public long preDispatch(IEventDispatcher dispatcher)
+  public long acquire()
   {
     return mRefCount.incrementAndGet();
   }
 
   /**
-   * {@inheritDoc}.  Defaults to empty.
+   * {@inheritDoc}.  Checks the internal reference count,
+   * and if not zero, throws an {@link IllegalStateException}.
    */
   public void delete()
   {
+    if (mRefCount.get() != 0)
+      throw new IllegalStateException(
+          "attempt to delete when valid references remain");
   }
 
   /**
    * {@inheritDoc}
    */
 
-  public long postHandle(IEventDispatcher dispatcher)
+  public long release()
   {
-    return mRefCount.decrementAndGet();
+    long retval = mRefCount.decrementAndGet();
+    if (retval <= 0)
+      this.delete();
+    return retval;
   }
 
 }

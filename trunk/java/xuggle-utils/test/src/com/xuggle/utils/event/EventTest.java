@@ -19,6 +19,9 @@
 
 package com.xuggle.utils.event;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 import com.xuggle.test_utils.NameAwareTestClassRunner;
@@ -49,5 +52,32 @@ public class EventTest
   {
     Event event = new Event(this){};
     assertTrue(event.getSource() == this);
+  }
+  
+  @Test
+  public void testDeleteIsCalled()
+  {
+    final AtomicBoolean deleteCalled = new AtomicBoolean(false);
+    Event event = new Event(this)
+    {
+      @Override
+      public void delete() {
+        deleteCalled.set(true);
+        super.delete();
+      };
+    };
+    event.acquire();
+    assertFalse(deleteCalled.get());
+    event.release();
+    assertTrue(deleteCalled.get());
+  }
+
+  @Test(expected=IllegalStateException.class)
+  public void testDeleteFailsIfNoAcquire()
+  {
+    Event event = new Event(this)
+    {
+    };
+    event.release();
   }
 }

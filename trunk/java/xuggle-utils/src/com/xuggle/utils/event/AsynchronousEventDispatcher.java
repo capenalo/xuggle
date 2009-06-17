@@ -128,10 +128,10 @@ implements IAsynchronousEventDispatcher
     if (event == null)
       return;
 
-    event.preDispatch(this);
-    
     synchronized(this)
     {
+      event.acquire();
+      
       log.trace("dispatchEvent({})", event);
       // we need to queue the event.
       if (event instanceof EventDispatcherAbortEvent)
@@ -140,8 +140,7 @@ implements IAsynchronousEventDispatcher
         IEvent queueEvent;
         while((queueEvent = mEventQueue.poll()) != null)
         {
-          if (queueEvent.postHandle(this) <= 0)
-            queueEvent.delete();
+          queueEvent.release();
         }
         // Abort always jumps to the front of the queue
         log.debug("aborting dispatcher");
@@ -158,15 +157,15 @@ implements IAsynchronousEventDispatcher
     boolean keepRunning = true;
     while (keepRunning)
     {
-      IEvent event = null;
       int numPendingEvents = 0;
-      while(event == null)
+      IEvent pollEvent = null;
+      synchronized(this)
       {
-        synchronized(this)
+        while (pollEvent == null)
         {
           numPendingEvents = mEventQueue.size();
-          event = mEventQueue.poll();
-          if (event == null)
+          pollEvent= mEventQueue.poll();
+          if (pollEvent == null)
           {
             // wait for a notification
             try
@@ -175,11 +174,12 @@ implements IAsynchronousEventDispatcher
             }
             catch(InterruptedException e)
             {
-              event = new EventDispatcherAbortEvent(this);
+              pollEvent = new EventDispatcherAbortEvent(this);
             }
           }
         }
       }
+      final IEvent event = pollEvent;
 
       if (event instanceof EventDispatcherStopEvent ||
           event instanceof EventDispatcherAbortEvent ||
@@ -190,8 +190,11 @@ implements IAsynchronousEventDispatcher
           log.debug("Got request to shut down");
           keepRunning = false;
           // empty the queue
-          mEventQueue.clear();
+          IEvent queueEvent;
+          while((queueEvent = mEventQueue.poll()) != null)
+            queueEvent.release();
         }
+        event.release();
       } else {
         try
         {
@@ -203,8 +206,7 @@ implements IAsynchronousEventDispatcher
           }
           finally
           {
-            if (event.postHandle(this) <= 0)
-              event.delete();
+            event.release();
           }
         } catch (Throwable t)
         {
