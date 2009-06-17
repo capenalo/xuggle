@@ -188,15 +188,16 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   public void dispatchEvent(IEvent event)
   {
     long dispatcherNum = mNumNestedEventDispatches.incrementAndGet();
+    final IEvent origEvent = event;
     try
     {
       if (event == null)
         throw new IllegalArgumentException("cannot dispatch null event");
       
-      event.preDispatch(this);
-      
       //log.debug("dispatching event: {}", event);
-      mPendingEventDispatches.add(event);
+      // do one acquire for adding to the queue
+      origEvent.acquire();
+      mPendingEventDispatches.add(origEvent);
       // don't process a dispatch if nested within a dispatchEvent() call;
       // wait for the stack to unwind, and then process it.
       while(!Thread.interrupted() &&
@@ -278,9 +279,9 @@ public class SynchronousEventDispatcher implements IEventDispatcher
                 handler));
           }
         }
+        // do one release for finishing the handle
+        event.release();
         //log.debug("Handling event: {} done", event);
-        if (event.postHandle(this) <= 0)
-          event.delete();
         
         // and finish by checking our reference queue and removing any event
         // handlers that are now dead.

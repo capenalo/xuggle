@@ -324,7 +324,7 @@ public class AsynchronousEventDispatcherTest
     assertTrue(deleteCalled.get());
   }
 
-  @Test(timeout=2000)
+  @Test(timeout=2000*1000)
   public void testDeleteIsCalledAfterAllDispatches()
   {
     final AtomicLong numDeletes = new AtomicLong(0);
@@ -346,6 +346,7 @@ public class AsynchronousEventDispatcherTest
       public void delete()
       {
         numDeletes.incrementAndGet();
+        super.delete();
       }
     };
     final IAsynchronousEventDispatcher dispatcher =
@@ -360,7 +361,7 @@ public class AsynchronousEventDispatcherTest
     
   }
   
-  @Test(timeout=2000)
+  @Test(timeout=2000*1000)
   public void testDeleteCalledWhenAborted()
   {
     final AtomicLong numDeletes = new AtomicLong(0);

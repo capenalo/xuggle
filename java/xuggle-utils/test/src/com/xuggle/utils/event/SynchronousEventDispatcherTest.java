@@ -569,6 +569,7 @@ public class SynchronousEventDispatcherTest
       public void delete()
       {
         numDeletes.incrementAndGet();
+        super.delete();
       }
     };
     final IEventDispatcher dispatcher = new SynchronousEventDispatcher();

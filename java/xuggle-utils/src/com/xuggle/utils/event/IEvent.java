@@ -58,28 +58,43 @@ public interface IEvent
   long getWhen();
 
   /**
-   * Called internally by dispatchers right before a {@link IEventDispatcher#dispatchEvent(IEvent)}
-   * is attempted.
-   * @param dispatcher the dispatcher added to.
-   * @return should return the total number of {@link #preDispatch(IEventDispatcher)}
-   *   calls - the total number of {@link #postHandle(IEventDispatcher)} calls.
+   * <p>
+   * Call this from an {@link IEventHandler} if you need to ensure
+   * the event remains valid after your handler returns.
+   * </p>
+   * <p>
+   * When you call {@link IEventDispatcher#dispatchEvent(IEvent)} with
+   * this {@link IEvent}, the dispatcher will call {@link #acquire()} before
+   * processing the event, and {@link #release()} when done.  In this way
+   * if you re-dispatch the event during handling, it won't be {@link #delete()}ed
+   * until all dispatchers have finished.
+   * </p>
+   * <p>
+   * Also, objects like {@link ErrorEvent} that contain other events,
+   * will call {@link #acquire()} to keep the event, and {@link #release()}
+   * when that event is actually {@link #delete()}ed.
+   * </p>
+   * 
+   * @return should return the total number of {@link #acquire()}
+   *   calls - the total number of {@link #release()} calls.
    */
-  long preDispatch(IEventDispatcher dispatcher);
+  long acquire();
   
   /**
    * Called by the {@link IEventDispatcher} when all handlers
    * for this event have been called during the dispatch cycle.
-   * If this method returns 0, the {@link IEventDispatcher} will
-   * call {@link #delete()} on this event.
-   * @param dispatcher
-   * @return should return the total number of {@link #preDispatch(IEventDispatcher)}
-   *   calls - the total number of {@link #postHandle(IEventDispatcher)} calls.
+   * If this method returns 0, the {@link IEvent} implementation should
+   * call {@link #delete()} internally.
+   * @return should return the total number of {@link #acquire()}
+   *   calls - the total number of {@link #release()} calls.
    */
-  long postHandle(IEventDispatcher dispatcher);
+  long release();
   
   /**
    * A method that is called when all dispatched events have finished
    * being handled.
+   * @throws IllegalStateException if the total number of references
+   *   to this event are not null.
    */
   void delete();
 
