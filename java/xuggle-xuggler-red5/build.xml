@@ -20,12 +20,9 @@
   <import file="mk/buildtools/buildhelper.xml"/>
 
   <!-- Create war files -->
-  <target name="stage-java">
+  <target name="stage-webapp-java">
     <webapp name="audiotranscoder"/>
     <webapp name="videotranscoder"/>
-    <antcall target="xuggle-buildhelper.stage-java"
-        inheritAll="true"
-        inheritRefs="true"/>
   </target>
 
   <!-- And install the red5 wars -->
