@@ -255,19 +255,17 @@ public class ThreadLifecycleManager extends StateMachine
     return result;
   }
 
-  public void addEventHandler(int priority,
+  public Key addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler)
   {
-    this.getEventDispatcher().addEventHandler(priority, eventClass, handler);
+    return this.getEventDispatcher().addEventHandler(priority, eventClass, handler);
   }
 
-  public void removeEventHandler(int priority,
-      Class<? extends IEvent> eventClass,
-      IEventHandler<? extends IEvent> handler)
+  public void removeEventHandler(Key key)
       throws IndexOutOfBoundsException
   {
-    this.getEventDispatcher().removeEventHandler(priority, eventClass, handler);
+    this.getEventDispatcher().removeEventHandler(key);
   }
 
   public void start()

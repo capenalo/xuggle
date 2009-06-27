@@ -26,6 +26,7 @@ import com.xuggle.utils.event.AsynchronousEventDispatcher;
 import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
+import com.xuggle.utils.event.IEventHandlerRegistrable;
 import com.xuggle.utils.sm.IState;
 import com.xuggle.utils.sm.State;
 import com.xuggle.utils.sm.StateMachine.TransitionEvent;
@@ -234,7 +235,7 @@ public class StateMachineTest
             }
         };
       
-      sm1.getEventDispatcher().addEventHandler(
+      w.key = sm1.getEventDispatcher().addEventHandler(
         0, TransitionEvent.class, w.handler);
 
       return w;
@@ -254,7 +255,7 @@ public class StateMachineTest
         // when remove the handler
 
         sm1.getEventDispatcher().removeEventHandler(
-          0, TransitionEvent.class, w.handler);
+          w.key);
       }
       catch (Exception e)
       {
@@ -272,6 +273,7 @@ public class StateMachineTest
         public State         from;
         public boolean       found = false;
         public IEventHandler<IEvent> handler;
+        public IEventHandlerRegistrable.Key key;
 
         Watcher(State from, State to)
         {

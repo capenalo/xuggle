@@ -61,11 +61,14 @@ import org.slf4j.LoggerFactory;
 
 public class SynchronousEventDispatcher implements IEventDispatcher
 {
-  private class HandlerReference extends WeakReference<IEventHandler<? extends IEvent>>
+  private class HandlerReference
+  extends WeakReference<IEventHandler<? extends IEvent>>
+  implements Key
   {
     private final Class<? extends IEvent> mClass;
     private final int mPriority;
     private final boolean mKeepingWeakReference;
+    private final IEventHandler<? extends IEvent> mHandler;
     public HandlerReference(IEventHandler<? extends IEvent> referent,
         ReferenceQueue<IEventHandler<? extends IEvent>> q,
             int priority, Class<? extends IEvent> clazz,
@@ -75,7 +78,12 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       super(referent, q);
       mClass = clazz;
       mPriority = priority;
-      mKeepingWeakReference = useWeakReference; 
+      mKeepingWeakReference = useWeakReference;
+      if (useWeakReference)
+        mHandler = null;
+      else
+        mHandler = referent;
+      
     }
 
     public Class<? extends IEvent> getEventClass()
@@ -91,6 +99,11 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     public boolean isKeepingWeakReference()
     {
       return mKeepingWeakReference;
+    }
+
+    public IEventHandler<? extends IEvent> getHandler()
+    {
+      return mHandler;
     }
   }
   final private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -125,13 +138,13 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     log.trace("<init>");
   }
   
-  public void addEventHandler(int priority,
+  public Key addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler)
   {
-    addEventHandler(priority, eventClass, handler, false);
+    return addEventHandler(priority, eventClass, handler, false);
   }
-  public void addEventHandler(int priority,
+  public Key addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler,
       boolean useWeakReferences)
@@ -145,7 +158,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     if (className == null || className.length() <= 0)
       throw new IllegalArgumentException("cannot get name of class");
    
-    HandlerReference reference = new HandlerReference(handler, 
+    HandlerReference reference = new HandlerReference(
+        handler, 
         mReferenceQueue,
         priority,
         eventClass,
@@ -182,6 +196,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     // now outside the lock, communicate what just happened
     dispatchEvent(new EventHandlerAddedEvent(this, priority, eventClass, handler,
         useWeakReferences));
+    return reference;
   }
 
   @SuppressWarnings("unchecked")
@@ -350,18 +365,26 @@ public class SynchronousEventDispatcher implements IEventDispatcher
 
   }
 
-  public void removeEventHandler(int priority,
-      Class<? extends IEvent> eventClass,
-      IEventHandler<? extends IEvent> handler) throws IndexOutOfBoundsException
+  public void removeEventHandler(final Key key) throws IndexOutOfBoundsException
   {
+    if (!(key instanceof HandlerReference))
+      throw new IndexOutOfBoundsException("key was not gotten from addEventHandler");
+    
+    final HandlerReference reference = (HandlerReference) key;
+    
+    final Class<? extends IEvent> eventClass = reference.getEventClass();
     if (eventClass == null)
       throw new IllegalArgumentException("cannot pass null class");
+    
+    final IEventHandler<? extends IEvent> handler = reference.getHandler();
     if (handler == null)
       throw new IllegalArgumentException("cannot pass null handler");
     
-    String className = eventClass.getName();
+    final String className = eventClass.getName();
     if (className == null || className.length() <= 0)
       throw new IllegalArgumentException("cannot get name of class");
+    
+    final int priority = reference.getPriority();
     synchronized(mHandlers)
     {
       Map<Integer, List<HandlerReference>> priorities

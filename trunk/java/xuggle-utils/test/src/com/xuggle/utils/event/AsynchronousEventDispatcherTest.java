@@ -36,6 +36,7 @@ import com.xuggle.utils.event.IAsynchronousEventDispatcher;
 import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
+import com.xuggle.utils.event.IEventHandlerRegistrable.Key;
 
 import org.junit.*;
 
@@ -79,12 +80,11 @@ public class AsynchronousEventDispatcherTest
       }
     };
     Class clazz = EventDispatcherStopEvent.class;
-    dispatcher.addEventHandler(0, clazz, handler);
-    dispatcher.removeEventHandler(0, clazz, handler);
+    Key key = dispatcher.addEventHandler(0, clazz, handler);
+    dispatcher.removeEventHandler(key);
   }
 
   @SuppressWarnings("unchecked")
-  @Test(expected=IndexOutOfBoundsException.class)
   public void testRemoveEventHandler() throws IndexOutOfBoundsException
   {
     IAsynchronousEventDispatcher dispatcher = new AsynchronousEventDispatcher(false);
@@ -98,8 +98,12 @@ public class AsynchronousEventDispatcherTest
       }
     };
     Class clazz = EventDispatcherStopEvent.class;
-    dispatcher.addEventHandler(0, clazz, handler);
-    dispatcher.removeEventHandler(1, clazz, handler);
+    Key key = dispatcher.addEventHandler(0, clazz, handler);
+    dispatcher.removeEventHandler(key);
+    try {
+      dispatcher.removeEventHandler(new Key(){});
+      Assert.fail("should not get here");
+    } catch (IndexOutOfBoundsException e){}
   }
   
   @Test
@@ -121,7 +125,7 @@ public class AsynchronousEventDispatcherTest
     // add the handler
     IAsynchronousEventDispatcher dispatcher = new AsynchronousEventDispatcher(false);
     assertTrue(dispatcher != null);
-    dispatcher.addEventHandler(0, TestEvent.class, handler);
+    Key key = dispatcher.addEventHandler(0, TestEvent.class, handler);
     TestEvent event = new TestEvent();
     assertTrue(!event.mWasHandled);
     dispatcher.dispatchEvent(event);
@@ -134,7 +138,7 @@ public class AsynchronousEventDispatcherTest
     dispatcher.waitForDispatcherToFinish(0);
     // and ensure we were handled
     assertTrue(event.mWasHandled);
-    dispatcher.removeEventHandler(0, TestEvent.class, handler);
+    dispatcher.removeEventHandler(key);
   }
   
   @Test(timeout=5000)

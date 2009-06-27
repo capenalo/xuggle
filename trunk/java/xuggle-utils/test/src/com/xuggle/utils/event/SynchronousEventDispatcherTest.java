@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 import com.xuggle.utils.Mutable;
@@ -69,11 +70,11 @@ public class SynchronousEventDispatcherTest
       }
     };
     Class<? extends IEvent> clazz = EventDispatcherStopEvent.class;
-    dispatcher.addEventHandler(0, clazz, handler);
-    dispatcher.removeEventHandler(0, clazz, handler);
+    IEventHandlerRegistrable.Key key = dispatcher.addEventHandler(0, clazz, handler);
+    dispatcher.removeEventHandler(key);
   }
 
-  @Test(expected=IndexOutOfBoundsException.class)
+  @Test
   public void testRemoveEventHandler() throws IndexOutOfBoundsException
   {
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
@@ -87,8 +88,13 @@ public class SynchronousEventDispatcherTest
       }
     };
     Class<? extends IEvent> clazz = EventDispatcherStopEvent.class;
-    dispatcher.addEventHandler(0, clazz, handler);
-    dispatcher.removeEventHandler(1, clazz, handler);
+    IEventHandlerRegistrable.Key key = dispatcher.addEventHandler(0, clazz, handler);
+    dispatcher.removeEventHandler(key);
+    try {
+      dispatcher.removeEventHandler(new IEventHandlerRegistrable.Key(){});
+      Assert.fail("should not get here");
+    } catch (IndexOutOfBoundsException e){}
+
   }
 
   @Test
@@ -111,12 +117,12 @@ public class SynchronousEventDispatcherTest
     // add the handler
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     assertTrue(dispatcher != null);
-    dispatcher.addEventHandler(0, TestEvent.class, handler);
+    IEventHandlerRegistrable.Key key = dispatcher.addEventHandler(0, TestEvent.class, handler);
     TestEvent event = new TestEvent();
     assertTrue(!event.mWasHandled);
     dispatcher.dispatchEvent(event);
     assertTrue(event.mWasHandled);
-    dispatcher.removeEventHandler(0, TestEvent.class, handler);
+    dispatcher.removeEventHandler(key);
   }
 
   @Test(timeout=5000)
@@ -260,50 +266,22 @@ public class SynchronousEventDispatcherTest
         super(source);
       }
     };
+    final AtomicReference<IEventHandlerRegistrable.Key> key =
+      new AtomicReference<IEventHandlerRegistrable.Key>(null);
     class TestEventHandler implements IEventHandler<TestEvent>
     {
 
       public boolean handleEvent(IEventDispatcher aDispatcher, TestEvent aEvent)
       {
-        aDispatcher.removeEventHandler(0, TestEvent.class, this);
+        aDispatcher.removeEventHandler(key.get());
         return false;
       }
     }
-    dispatcher.addEventHandler(0, TestEvent.class, new TestEventHandler());
+    key.set(dispatcher.addEventHandler(0, TestEvent.class, new TestEventHandler()));
     dispatcher.dispatchEvent(new TestEvent(this));
     // we should get here without a failure.
   }
 
-  /**
-   * Tests remove an event handler that has not been
-   * added, but at a priority and event class that
-   * already has been added
-   */
-  @Test(expected=IndexOutOfBoundsException.class)
-  public void testRemoveEventHandlerMissingHandler()
-  {
-    IEventDispatcher dispatcher = new SynchronousEventDispatcher();
-    assertTrue(dispatcher != null);
-
-    IEventHandler<IEvent> handler = new IEventHandler<IEvent>()
-    {
-      public boolean handleEvent(IEventDispatcher dispatcher, IEvent event)
-      {
-        return false;
-      }
-    };
-    Class<? extends IEvent> clazz = EventDispatcherStopEvent.class;
-    dispatcher.addEventHandler(0, clazz, handler);
-    // This should fail
-    dispatcher.removeEventHandler(0, clazz, new IEventHandler<IEvent>(){
-
-      public boolean handleEvent(IEventDispatcher aDispatcher, IEvent aEvent)
-      {
-        return false;
-      }
-
-    });
-  }
   @Test
   public void testEventCalledBeforeRemovalAndNotAfterwards()
   {
@@ -311,6 +289,8 @@ public class SynchronousEventDispatcherTest
 
     IEventDispatcher dispatcher = new SynchronousEventDispatcher();
     assertTrue(dispatcher != null);
+    final AtomicReference<IEventHandlerRegistrable.Key> key =
+      new AtomicReference<IEventHandlerRegistrable.Key>(null);
 
     class TestEvent extends Event
     {
@@ -330,11 +310,11 @@ public class SynchronousEventDispatcherTest
       public boolean handleEvent(IEventDispatcher aDispatcher, TestEvent aEvent)
       {
         mCount.incrementAndGet();
-        aDispatcher.removeEventHandler(0, TestEvent.class, this);
+        aDispatcher.removeEventHandler(key.get());
         return false;
       }
     }
-    dispatcher.addEventHandler(0, TestEvent.class, new TestEventHandler(numCalls));
+    key.set(dispatcher.addEventHandler(0, TestEvent.class, new TestEventHandler(numCalls)));
     assertEquals("should not yet be handled", 0, numCalls.get());
     dispatcher.dispatchEvent(new TestEvent(this));
     assertEquals("should be handled once", 1, numCalls.get());
@@ -408,16 +388,19 @@ public class SynchronousEventDispatcherTest
         // until this handleEvent has fully unwound
         // dispatch the second event
         dispatcher.dispatchEvent(secondEvent);
-        dispatcher.addEventHandler(0, secondEvent.getClass(), 
+        final AtomicReference<IEventHandlerRegistrable.Key> key =
+          new AtomicReference<IEventHandlerRegistrable.Key>(null);
+
+        key.set(dispatcher.addEventHandler(0, secondEvent.getClass(), 
             new IEventHandler<IEvent>(){
           public boolean handleEvent(IEventDispatcher dispatcher,
               IEvent event)
           {
             assertTrue(gotFirstEvent.get());
             gotSecondEvent.set(true);
-            dispatcher.removeEventHandler(0, event.getClass(), this);
+            dispatcher.removeEventHandler(key.get());
             return false;
-          }});
+          }}));
         gotFirstEvent.set(true);
         return false;
       }};
@@ -453,17 +436,16 @@ public class SynchronousEventDispatcherTest
         return false;
       }};
 
-      dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
+      IEventHandlerRegistrable.Key key1=
+        dispatcher.addEventHandler(0, EventHandlerAddedEvent.class,
           addHandler
       );
-      dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
+      IEventHandlerRegistrable.Key key2= 
+        dispatcher.addEventHandler(0, EventHandlerRemovedEvent.class,
           removeHandler
       );
-      dispatcher.removeEventHandler(0, EventHandlerAddedEvent.class,
-          addHandler);
-      dispatcher.removeEventHandler(0, EventHandlerRemovedEvent.class,
-          removeHandler
-      );
+      dispatcher.removeEventHandler(key1);
+      dispatcher.removeEventHandler(key2);
       assertEquals(2, numAdds.get());
       assertEquals(1, numRemoves.get()); // shouldn't get the last remove
   }

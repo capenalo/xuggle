@@ -19,6 +19,8 @@
 
 package com.xuggle.utils.event.handler;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
@@ -130,7 +132,7 @@ public class Handler
    */
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
       final Class<? extends E> eventClass,
@@ -164,6 +166,9 @@ public class Handler
     } else
       targetedHandler = boundedHandler;
 
+    final AtomicReference<IEventHandlerRegistrable.Key> key =
+      new AtomicReference<IEventHandlerRegistrable.Key>(null);
+    
     if (maxTimesToCall > 0)
     {
       BoundedHandler<E> bHandler = (BoundedHandler<E>)boundedHandler;
@@ -171,9 +176,7 @@ public class Handler
         public boolean handleEvent(IEventDispatcher dispatcher, E event)
         {
           try {
-            registry.removeEventHandler(priority,
-                eventClass,
-                targetedHandler);
+            registry.removeEventHandler(key.get());
           } catch (IndexOutOfBoundsException e) {
             // if someone has already removed us, ignore it.
             do {
@@ -184,8 +187,8 @@ public class Handler
         }}
       );
     }
-    registry.addEventHandler(priority, eventClass, targetedHandler);
-    return targetedHandler;
+    key.set(registry.addEventHandler(priority, eventClass, targetedHandler));
+    return key.get();
   }
 
   /**
@@ -203,7 +206,7 @@ public class Handler
    */
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
       final Class<? extends E> eventClass,
@@ -232,7 +235,7 @@ public class Handler
    */
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final Class<? extends E> eventClass,
       final int maxTimesToCall,
@@ -261,7 +264,7 @@ public class Handler
    */
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final Class<? extends E> eventClass,
       Object sourceToTarget,
@@ -293,7 +296,7 @@ public class Handler
    */
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
       final Class<? extends E> eventClass,
@@ -325,7 +328,7 @@ public class Handler
 
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final Class<? extends E> eventClass,
       Object sourceToTarget,
@@ -354,7 +357,7 @@ public class Handler
    */
 
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
       final Class<? extends E> eventClass,
@@ -380,7 +383,7 @@ public class Handler
    * @return the handler we registered.
    */
   public static <E extends IEvent>
-  IEventHandler<E> register(
+  IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final Class<? extends E> eventClass,
       final IEventHandler<E> proxiedHandler
