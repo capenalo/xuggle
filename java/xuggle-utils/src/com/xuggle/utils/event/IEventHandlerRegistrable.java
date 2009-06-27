@@ -30,6 +30,18 @@ package com.xuggle.utils.event;
 public interface IEventHandlerRegistrable
 {
   /**
+   * A marker interface returned by
+   * {@link IEventHandlerRegistrable#addEventHandler(int, Class, IEventHandler, boolean)}
+   * for use by {@link IEventHandlerRegistrable#removeEventHandler(Key)}
+   * 
+   * @author aclarke
+   *
+   */
+  public interface Key {
+    
+  };
+  
+  /**
    * Adds an event handler for the given eventClass (and
    * all children).
    * 
@@ -44,7 +56,7 @@ public interface IEventHandlerRegistrable
    * @param priority An arbitrary priority you can assign; lower numbers are higher
    *   priority.  All event handlers at a higher priority are called
    *   before lower handles.  You must match the priority in the
-   *   {@link #removeEventHandler(int, Class, IEventHandler)} call as well.   
+   *   {@link #removeEventHandler(Key)} call as well.   
    * @param eventClass  Specifies the class of events that should be
    *   passed to this handler.  The dispatcher will ensure that the
    *   passed event is of the passed type.
@@ -64,10 +76,11 @@ public interface IEventHandlerRegistrable
    *   only handler2 will be called.
    * @param handler The handler to call if an appropriate event is being
    *   dispatched by the dispatcher.
+   * @return A key suitable for passing to {@link #removeEventHandler(Key)}
    *   
    */
 
-  void addEventHandler(int priority,
+  Key addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler);
 
@@ -86,7 +99,7 @@ public interface IEventHandlerRegistrable
    * @param priority An arbitrary priority you can assign; lower numbers are higher
    *   priority.  All event handlers at a higher priority are called
    *   before lower handles.  You must match the priority in the
-   *   {@link #removeEventHandler(int, Class, IEventHandler)} call as well.   
+   *   {@link #removeEventHandler(Key)} call as well.   
    * @param eventClass  Specifies the class of events that should be
    *   passed to this handler.  The dispatcher will ensure that the
    *   passed event is of the passed type.
@@ -110,17 +123,17 @@ public interface IEventHandlerRegistrable
    *  handler will only maintain a weak reference to it.  If the handler
    *  is collected before an event is dispatched to it, the {@link IEventDispatcher}
    *  object dispatching will ignore the handler.
+   * @return A key suitable for passing to {@link #removeEventHandler(Key)}
    *
    */
 
-  void addEventHandler(int priority,
+  Key addEventHandler(int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler,
       boolean useWeakReferences);
 
   /**
-   * Removes a previously registered event class and event handler
-   * combo.
+   * Removes handlers previously registered with a given key.
    * 
    * <p>
    * 
@@ -129,20 +142,15 @@ public interface IEventHandlerRegistrable
    * removed from.
    * 
    * </p>
+   * @param key A key as returned from {@link #addEventHandler(int, Class, IEventHandler, boolean)}
    * 
-   * @param priority The priority used with calling
-   *  {@link #addEventHandler(int, Class, IEventHandler)}
-   * @param eventClass The class passed to addEventHandler()
-   * @param handler The handler passed to addEventHandler()
    * @exception IndexOutOfBoundsException Throws this if the combo of
    *   eventClass and handler is not currently registered with this
    *   dispatcher.
    *   
    */
   
-  void removeEventHandler(int priority,
-      Class<? extends IEvent> eventClass,
-      IEventHandler<? extends IEvent> handler)
+  void removeEventHandler(Key key)
   throws IndexOutOfBoundsException;
 
 }

@@ -21,6 +21,8 @@ package com.xuggle.utils.event;
 
 import java.lang.ref.ReferenceQueue;
 
+import com.xuggle.utils.event.IEventHandlerRegistrable.Key;
+
 /**
  * Fired by an {@link IEventDispatcher} when an {@link IEventHandler}
  * object is removed.
@@ -28,7 +30,7 @@ import java.lang.ref.ReferenceQueue;
  * <p>
  * 
  * This is fired in response to a successful
- *  {@link IEventHandlerRegistrable#removeEventHandler(int, Class, IEventHandler)}
+ *  {@link IEventHandlerRegistrable#removeEventHandler(Key)}
  * call.  It will also be fired if the {@link IEventDispatcher} is maintaining
  * weak references to a {@link IEventHandler}, but the {@link IEventDispatcher}
  * detects the weak reference has been collected.
@@ -58,7 +60,7 @@ import java.lang.ref.ReferenceQueue;
  * for handlers, you should never rely on this event being fired.  If you're
  * using strong references, you may rely on this event being fired in response
  * to
- * {@link IEventHandlerRegistrable#removeEventHandler(int, Class, IEventHandler)}
+ * {@link IEventHandlerRegistrable#removeEventHandler(Key)}
  * 
  * </p>
  * 

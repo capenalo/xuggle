@@ -219,26 +219,24 @@ public class StateMachine implements IEventHandlerRegistrable
         }
     }
 
-    public void addEventHandler(int priority,
+    public Key addEventHandler(int priority,
         Class<? extends IEvent> eventClass,
         IEventHandler<? extends IEvent> handler)
     {
-      getEventDispatcher().addEventHandler(priority, eventClass, handler);
+      return getEventDispatcher().addEventHandler(priority, eventClass, handler);
     }
 
-    public void removeEventHandler(int priority,
-        Class<? extends IEvent> eventClass,
-        IEventHandler<? extends IEvent> handler)
+    public void removeEventHandler(Key key)
         throws IndexOutOfBoundsException
     {
-      getEventDispatcher().removeEventHandler(priority, eventClass, handler);
+      getEventDispatcher().removeEventHandler(key);
     }
 
-    public void addEventHandler(int priority,
+    public Key addEventHandler(int priority,
         Class<? extends IEvent> eventClass,
         IEventHandler<? extends IEvent> handler, boolean useWeakReferences)
     {
-      getEventDispatcher().addEventHandler(priority, eventClass, handler,
+      return getEventDispatcher().addEventHandler(priority, eventClass, handler,
           useWeakReferences);
     }
 }

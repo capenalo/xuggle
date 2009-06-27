@@ -26,6 +26,7 @@ import com.xuggle.utils.event.IEvent;
 import com.xuggle.utils.event.IEventDispatcher;
 import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.event.IEventHandlerRegistrable;
+import com.xuggle.utils.event.IEventHandlerRegistrable.Key;
 
 /**
  * An {@link IEventHandler} that proxies another {@link IEventHandler},
@@ -33,7 +34,7 @@ import com.xuggle.utils.event.IEventHandlerRegistrable;
  * number of times.
  * <p>
  * The user is still responsible for calling
- *  {@link IEventHandlerRegistrable#removeEventHandler(int, Class, IEventHandler)}
+ *  {@link IEventHandlerRegistrable#removeEventHandler(Key)}
  *  if appropriate for this handler to avoid clogging up memory in a
  *  dispatcher, but after the maximum number of calls have been reached,
  *  this handler will not handle any more events.  Note that if you don't
