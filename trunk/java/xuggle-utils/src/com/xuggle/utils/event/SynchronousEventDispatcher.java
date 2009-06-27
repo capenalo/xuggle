@@ -67,7 +67,6 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   {
     private final Class<? extends IEvent> mClass;
     private final int mPriority;
-    private final boolean mKeepingWeakReference;
     private final IEventHandler<? extends IEvent> mHandler;
     public HandlerReference(IEventHandler<? extends IEvent> referent,
         ReferenceQueue<IEventHandler<? extends IEvent>> q,
@@ -78,7 +77,6 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       super(referent, q);
       mClass = clazz;
       mPriority = priority;
-      mKeepingWeakReference = useWeakReference;
       if (useWeakReference)
         mHandler = null;
       else
@@ -96,11 +94,6 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       return mPriority;
     }
 
-    public boolean isKeepingWeakReference()
-    {
-      return mKeepingWeakReference;
-    }
-
     public IEventHandler<? extends IEvent> getHandler()
     {
       return mHandler;
@@ -116,8 +109,6 @@ public class SynchronousEventDispatcher implements IEventDispatcher
    *        A list of event Handler
    */
 
-  private final Map<IEventHandler<? extends IEvent>,
-   Queue<IEventHandler<? extends IEvent>>> mStrongReferences;
   private final Map<String, SortedMap<Integer,
   List<HandlerReference>>> mHandlers;
   
@@ -130,8 +121,6 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   {
     mNumNestedEventDispatches = new AtomicLong(0);
     mPendingEventDispatches = new ConcurrentLinkedQueue<IEvent>();
-    mStrongReferences = new HashMap<IEventHandler<? extends IEvent>,
-    Queue<IEventHandler<? extends IEvent>>>(); 
     mHandlers = new HashMap<String, SortedMap<Integer,
       List<HandlerReference>>>();
     mReferenceQueue = new ReferenceQueue<IEventHandler<? extends IEvent>>();
@@ -181,20 +170,12 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         priorities.put(priority, handlers);
       }
       handlers.add(reference);
-      if (!useWeakReferences) {
-        Queue<IEventHandler<? extends IEvent>> refs =
-          mStrongReferences.get(handler);
-        if (refs == null) {
-          refs = new LinkedList<IEventHandler<? extends IEvent>>();
-          mStrongReferences.put(handler, refs);
-        }
-        refs.offer(handler);
-      }
       // and we're done.
     }
     
     // now outside the lock, communicate what just happened
-    dispatchEvent(new EventHandlerAddedEvent(this, priority, eventClass, handler,
+    dispatchEvent(new EventHandlerAddedEvent(this, reference,
+        priority, eventClass, handler,
         useWeakReferences));
     return reference;
   }
@@ -360,7 +341,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       }
     }
     // now outside the lock, communicate what just happened
-    dispatchEvent(new EventHandlerRemovedEvent(this, priority, eventClass,
+    dispatchEvent(new EventHandlerRemovedEvent(this, deadRef,
+        priority, eventClass,
         null));
 
   }
@@ -416,20 +398,6 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         {
           iter.remove();
           ++handlersNuked;
-          if (!registeredHandlerReference.isKeepingWeakReference())
-          {
-            Queue<IEventHandler<? extends IEvent>> refs =
-              mStrongReferences.get(handler);
-            if (refs != null)
-            {
-              // get ride of one reference we kept
-              refs.poll();
-              // and kill the index entry if this is the last
-              // reference
-              if (refs.size() == 0)
-                mStrongReferences.remove(registeredHandler);
-            }
-          }
           // and we're done; break the loop
           break;
         }
@@ -451,7 +419,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       }
     }
     // now outside the lock, communicate what just happened
-    dispatchEvent(new EventHandlerRemovedEvent(this, priority, eventClass, handler));
+    dispatchEvent(new EventHandlerRemovedEvent(this, reference, priority, eventClass, handler));
 
   }
 
