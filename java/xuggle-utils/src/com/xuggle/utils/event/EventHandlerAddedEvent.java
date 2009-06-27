@@ -30,6 +30,7 @@ package com.xuggle.utils.event;
 public class EventHandlerAddedEvent extends Event
 {
 
+  private final IEventHandlerRegistrable.Key mKey;
   private final int mPriority;
   private final Class<? extends IEvent> mEventClass;
   private final IEventHandler<? extends IEvent> mHandler;
@@ -41,6 +42,7 @@ public class EventHandlerAddedEvent extends Event
    * Only for creation by EventDispatchers.
    *  
    * @param source The {@link IEventDispatcher} the handler was added to
+   * @param key The key that was returned by the addEventHandler method.
    * @param priority The priority used (higher means higher priority)
    * @param eventClass The class that the handler will be executed for.
    * @param handler The handler itself
@@ -49,6 +51,7 @@ public class EventHandlerAddedEvent extends Event
    */
   
   public EventHandlerAddedEvent(IEventDispatcher source,
+      IEventHandlerRegistrable.Key key,
       int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler,
@@ -59,6 +62,7 @@ public class EventHandlerAddedEvent extends Event
     mEventClass = eventClass;
     mHandler = handler;
     mKeepingWeakReference = isKeepingWeekReference;
+    mKey = key;
   }
   
   /**
@@ -114,6 +118,15 @@ public class EventHandlerAddedEvent extends Event
   public int getPriority()
   {
     return mPriority;
+  }
+
+  /**
+   * The key for use in {@link IEventHandlerRegistrable#removeEventHandler(IEventHandlerRegistrable.Key)}
+   * @return the key
+   */
+  public IEventHandlerRegistrable.Key getKey()
+  {
+    return mKey;
   }
   
 

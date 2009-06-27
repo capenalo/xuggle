@@ -75,6 +75,7 @@ public class EventHandlerRemovedEvent extends Event
   private final int mPriority;
   private final Class<? extends IEvent> mEventClass;
   private final IEventHandler<? extends IEvent> mHandler;
+  private final IEventHandlerRegistrable.Key mKey;
 
   /**
    * Fired when an {@link IEventDispatcher} object
@@ -83,12 +84,14 @@ public class EventHandlerRemovedEvent extends Event
    * Only for creation by EventDispatchers.
    *  
    * @param source The {@link IEventDispatcher} the handler was removed from
+   * @param key The key that was deleted
    * @param priority The priority used (higher means higher priority)
    * @param eventClass The class that the handler would have been executed for.
    * @param handler The handler itself, or null if unknown.
    */
   
   public EventHandlerRemovedEvent(IEventDispatcher source,
+      IEventHandlerRegistrable.Key key,
       int priority,
       Class<? extends IEvent> eventClass,
       IEventHandler<? extends IEvent> handler)
@@ -97,6 +100,7 @@ public class EventHandlerRemovedEvent extends Event
     mPriority = priority;
     mEventClass = eventClass;
     mHandler = handler;
+    mKey = key;
   }
   
   /**
@@ -150,6 +154,15 @@ public class EventHandlerRemovedEvent extends Event
   public int getPriority()
   {
     return mPriority;
+  }
+
+  /**
+   * The key that was removed.
+   * @return the key
+   */
+  public IEventHandlerRegistrable.Key getKey()
+  {
+    return mKey;
   }
   
 
