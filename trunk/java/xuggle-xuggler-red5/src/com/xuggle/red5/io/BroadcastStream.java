@@ -78,6 +78,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
   private StreamCodecInfo mCodecInfo;
   private VideoCodecFactory mVideoCodecFactory;
   private boolean mCreateVideoCodecInfo;
+  private Long mCreationTime;
 
 
   public BroadcastStream(String name)
@@ -91,6 +92,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
     mCreateVideoCodecInfo = false;
     mCodecInfo = new StreamCodecInfo();
     mVideoCodecFactory = null;
+    mCreationTime = null;
   }
 
   public IProvider getProvider()
@@ -238,6 +240,9 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
           RTMPMessage msg = new RTMPMessage();
 
           msg.setBody(rtmpEvent);
+          if (mCreationTime == null)
+            mCreationTime = (long)
+            (rtmpEvent.getTimestamp() + rtmpEvent.getExtendedTimestamp()<<24);
           try
           {
             if (event instanceof AudioData)
@@ -294,5 +299,10 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
     } finally {
       point.collect();
     }
+  }
+
+  public long getCreationTime()
+  {
+    return mCreationTime != null ? mCreationTime : 0L;
   }
 }
