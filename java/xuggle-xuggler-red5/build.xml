@@ -20,7 +20,7 @@
   <import file="mk/buildtools/buildhelper.xml"/>
 
   <!-- Create war files -->
-  <target name="stage-webapp-java">
+  <target name="webapp">
     <webapp name="audiotranscoder"/>
     <webapp name="videotranscoder"/>
   </target>
