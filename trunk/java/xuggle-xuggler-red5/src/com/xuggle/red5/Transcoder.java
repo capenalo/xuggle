@@ -857,7 +857,8 @@ public class Transcoder implements Runnable
           inPicture.getHeight()
       });
       if (retval <= 0) {
-        throw new RuntimeException("could not decode video");
+        log.info("Could not decode video: {}", retval);
+        return;
       }
       offset += retval;
       
