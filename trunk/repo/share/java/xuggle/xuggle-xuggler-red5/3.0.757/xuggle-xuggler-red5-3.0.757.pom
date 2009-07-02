@@ -11,7 +11,7 @@
   <groupId>xuggle</groupId>
   <artifactId>xuggle-xuggler-red5</artifactId>
   <packaging>jar</packaging>
-  <version>3.0.721</version>
+  <version>3.0.757</version>
   <dependencies>
     <dependency>
       <groupId>xuggle</groupId>
