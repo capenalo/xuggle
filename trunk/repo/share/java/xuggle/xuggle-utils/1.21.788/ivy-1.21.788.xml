@@ -1,11 +1,11 @@
 <ivy-module version="2.0">
 
-  <info organisation="xuggle" module="xuggle-utils" revision="1.18.114" status="integration" publication="20090129150305"/>
+  <info organisation="xuggle" module="xuggle-utils" revision="1.21.788" status="integration" publication="20090706214327"/>
 
   <configurations>
     <conf name="default" description="default configuration"/>
-    <conf name="compile" extends="default" description="compiling dependencies"/>
-    <conf name="test" extends="default" description="Unit testing dependencies"/>
+    
+    
   </configurations>
   <publications>
     <artifact name="xuggle-utils" type="jar" conf="default" ext="jar"/>
@@ -18,7 +18,7 @@
 
     <!--  Include for JUnit Test framework utils -->
     <dependency org="junit" name="junit" rev="4.5"/>
-    <dependency org="multithreadedtc" conf="test->default" name="multithreadedtc" rev="1.01"/>
+    
 
   </dependencies>
 </ivy-module>
