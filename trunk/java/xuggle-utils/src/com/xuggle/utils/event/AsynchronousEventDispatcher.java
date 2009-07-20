@@ -183,7 +183,7 @@ implements IAsynchronousEventDispatcher
 
       if (event instanceof EventDispatcherStopEvent ||
           event instanceof EventDispatcherAbortEvent ||
-          Thread.interrupted())
+          Thread.currentThread().isInterrupted())
       {
         synchronized(this)
         {
