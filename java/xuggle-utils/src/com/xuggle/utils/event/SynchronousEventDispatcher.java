@@ -196,7 +196,7 @@ public class SynchronousEventDispatcher implements IEventDispatcher
       mPendingEventDispatches.add(origEvent);
       // don't process a dispatch if nested within a dispatchEvent() call;
       // wait for the stack to unwind, and then process it.
-      while(!Thread.interrupted() &&
+      while(!Thread.currentThread().isInterrupted() &&
           dispatcherNum == 1 &&
           (event = mPendingEventDispatches.poll()) != null)
       {
@@ -246,9 +246,9 @@ public class SynchronousEventDispatcher implements IEventDispatcher
         }
         log.trace("Handling event: {} with {} handlers", event, handlers.size());
         Iterator<IEventHandler<? extends IEvent>> handlersIter = handlers.iterator();
-        while(!Thread.interrupted() && 
-            !eventHandled &&
-            handlersIter.hasNext())
+        while(!eventHandled &&
+            handlersIter.hasNext() &&
+            !Thread.currentThread().isInterrupted())
         {
           // deliberately untyped!
           IEventHandler handler = handlersIter.next();
