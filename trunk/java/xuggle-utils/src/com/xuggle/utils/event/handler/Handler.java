@@ -135,7 +135,7 @@ public class Handler
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       final Object sourceToTarget,
       final int maxTimesToCall,
       final IEventHandler<E> proxiedHandler
@@ -209,7 +209,7 @@ public class Handler
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       final int maxTimesToCall,
       final IEventHandler<E> proxiedHandler
   )
@@ -237,7 +237,7 @@ public class Handler
   public static <E extends IEvent>
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       final int maxTimesToCall,
       final IEventHandler<E> proxiedHandler
   )
@@ -266,7 +266,7 @@ public class Handler
   public static <E extends IEvent>
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       Object sourceToTarget,
       final int maxTimesToCall,
       final IEventHandler<E> proxiedHandler
@@ -299,7 +299,7 @@ public class Handler
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       final Object sourceToTarget,
       final IEventHandler<E> proxiedHandler
   )
@@ -330,7 +330,7 @@ public class Handler
   public static <E extends IEvent>
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       Object sourceToTarget,
       final IEventHandler<E> proxiedHandler
   )
@@ -360,7 +360,7 @@ public class Handler
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
       final int priority,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       final IEventHandler<E> proxiedHandler
   )
   {
@@ -385,7 +385,7 @@ public class Handler
   public static <E extends IEvent>
   IEventHandlerRegistrable.Key register(
       final IEventHandlerRegistrable registry,
-      final Class<? extends E> eventClass,
+      final Class<? extends IEvent> eventClass,
       final IEventHandler<E> proxiedHandler
   )
   {
