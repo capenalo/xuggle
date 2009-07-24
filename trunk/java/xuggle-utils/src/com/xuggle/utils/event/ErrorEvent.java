@@ -173,25 +173,28 @@ public class ErrorEvent extends Event
   {
     final StringBuilder string = new StringBuilder();
     string.append(super.getDescription());
-    final String message = getMessage();
-    if (message != null && message.length()>0)
-      string.append("message="+message+";");
     final IEvent event = getEvent();
     if (event != null)
       string.append("event="+event+";");
     final IEventHandler<? extends IEvent> handler = getHandler();
     if (handler!=null)
       string.append("handler="+handler+";");
+    final String message = getMessage();
+    if (message != null && message.length()>0) {
+      string.append("\n");
+      string.append("message="+message+";");
+    }
     
     final Throwable t = getException();
     if (t != null)
     {
-      string.append("exception="+t+";");
+      string.append("trace=\n");
+      string.append(t);
+      string.append("\n");
+
       StackTraceElement[] elements=t.getStackTrace();
       if (elements != null && elements.length>0)
       {
-        string.append("stack trace=\n");
-
         int i = 0;
         for(StackTraceElement elem : elements)
         {
@@ -205,6 +208,12 @@ public class ErrorEvent extends Event
     }
     return string.toString();
   }
+
+//  public static void main(String[] args)
+//  {
+//    Integer t = new Integer(1);
+//    new ErrorEvent(t, new RuntimeException("ze exception"), "ye old message");
+//  }
 
   /**
    * The exception associated with this error, or null if none.
