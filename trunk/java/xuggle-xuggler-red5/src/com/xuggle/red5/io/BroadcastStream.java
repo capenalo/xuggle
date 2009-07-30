@@ -254,7 +254,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
               IVideoStreamCodec videoStreamCodec = null;
               if (mVideoCodecFactory != null && mCreateVideoCodecInfo)
               {
-                videoStreamCodec = mVideoCodecFactory.getVideoCodec(((VideoData) event).getData());
+                videoStreamCodec = VideoCodecFactory.getVideoCodec(((VideoData) event).getData());
                 mCodecInfo.setVideoCodec(videoStreamCodec);
                 mCreateVideoCodecInfo= false;
               } else if (mCodecInfo != null) {
