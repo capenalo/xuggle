@@ -76,10 +76,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
 
   // Codec handling stuff for frame dropping
   private StreamCodecInfo mCodecInfo;
-  private VideoCodecFactory mVideoCodecFactory;
-  private boolean mCreateVideoCodecInfo;
   private Long mCreationTime;
-
 
   public BroadcastStream(String name)
   {
@@ -89,9 +86,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
 
     // we want to create a video codec when we get our
     // first video packet.
-    mCreateVideoCodecInfo = false;
     mCodecInfo = new StreamCodecInfo();
-    mVideoCodecFactory = null;
     mCreationTime = null;
   }
 
@@ -177,15 +172,6 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
   public void start()
   {
     log.trace("start()");
-    // Red5 uses a nice handy dandy bean context for this but we're not.
-    try {
-      mVideoCodecFactory = (VideoCodecFactory) getScope().getContext()
-      .getBean(VideoCodecFactory.KEY);
-      mCreateVideoCodecInfo = true;
-    } catch (Exception err) {
-      log.warn("No video codec factory available.", err);
-    }
-
   }
 
   public void stop()
@@ -252,11 +238,10 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
             else if (event instanceof VideoData)
             {
               IVideoStreamCodec videoStreamCodec = null;
-              if (mVideoCodecFactory != null && mCreateVideoCodecInfo)
+              if (mCodecInfo.getVideoCodec() == null)
               {
                 videoStreamCodec = VideoCodecFactory.getVideoCodec(((VideoData) event).getData());
                 mCodecInfo.setVideoCodec(videoStreamCodec);
-                mCreateVideoCodecInfo= false;
               } else if (mCodecInfo != null) {
                 videoStreamCodec = mCodecInfo.getVideoCodec();
               }
