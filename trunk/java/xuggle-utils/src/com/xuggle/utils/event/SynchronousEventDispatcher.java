@@ -251,36 +251,44 @@ public class SynchronousEventDispatcher implements IEventDispatcher
           }
         }
         log.trace("Handling event: {} with {} handlers", event, numHandlers);
-        for(int i = 0; i < numHandlers; i++) {
-          if (eventHandled)
-            break;
-          if (Thread.currentThread().isInterrupted())
-            break;
-          final IEventHandler handler = mHandlersToCall[i];
-          if (handler == null)
-            break;
-          //log.debug("Handling event: {} with handler: {}", event, handler);
-          try {
-            eventHandled = handler.handleEvent(this, event);
+        int i = 0;
+        try {
+          for(i = 0; i < numHandlers; i++) {
+            final IEventHandler handler = mHandlersToCall[i];
+            mHandlersToCall[i] = null;
+            if (eventHandled)
+              break;
+            if (Thread.currentThread().isInterrupted())
+              break;
+            if (handler == null)
+              break;
+            //log.debug("Handling event: {} with handler: {}", event, handler);
+            try {
+              eventHandled = handler.handleEvent(this, event);
+            }
+            catch (AssertionError t) {
+              // to enable tests to continue working, we dispatch an event but
+              // rethrow.
+              dispatchEvent(new ErrorEvent(event.getSource(),
+                  t,
+                  "uncaught exception",
+                  event,
+                  handler));
+              throw t;
+            }
+            catch (Throwable t)
+            {
+              dispatchEvent(new ErrorEvent(event.getSource(),
+                  t,
+                  "uncaught exception",
+                  event,
+                  handler));
+            }
           }
-          catch (AssertionError t) {
-            // to enable tests to continue working, we dispatch an event but
-            // rethrow.
-            dispatchEvent(new ErrorEvent(event.getSource(),
-                t,
-                "uncaught exception",
-                event,
-                handler));
-            throw t;
-          }
-          catch (Throwable t)
-          {
-            dispatchEvent(new ErrorEvent(event.getSource(),
-                t,
-                "uncaught exception",
-                event,
-                handler));
-          }
+        } finally {
+          // clear out any handlers we didn't clear above 
+          for(; i < numHandlers; i++)
+            mHandlersToCall[i] = null;
         }
         // do one release for finishing the handle
         event.release();
