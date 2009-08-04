@@ -20,6 +20,7 @@
 package com.xuggle.utils.event;
 
 import java.util.LinkedList;
+import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ implements IAsynchronousEventDispatcher
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private Thread mDispatchThread;
-  private LinkedList<IEvent> mEventQueue;
+  private Queue<IEvent> mEventQueue;
 
   /**
    * Create a new event dispatcher
