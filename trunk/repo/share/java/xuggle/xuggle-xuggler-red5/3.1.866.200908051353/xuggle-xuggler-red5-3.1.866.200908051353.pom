@@ -11,12 +11,12 @@
   <groupId>xuggle</groupId>
   <artifactId>xuggle-xuggler-red5</artifactId>
   <packaging>jar</packaging>
-  <version>3.1.849.200907301327</version>
+  <version>3.1.866.200908051353</version>
   <dependencies>
     <dependency>
       <groupId>xuggle</groupId>
       <artifactId>xuggle-utils</artifactId>
-      <version>1.21.833</version>
+      <version>1.21.843.200908041119</version>
       <optional>true</optional>
     </dependency>
     <dependency>
