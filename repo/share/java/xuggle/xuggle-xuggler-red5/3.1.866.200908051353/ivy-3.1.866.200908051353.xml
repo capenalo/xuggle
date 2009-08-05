@@ -1,5 +1,5 @@
 <ivy-module version="1.0">
-  <info organisation="xuggle" module="xuggle-xuggler-red5" revision="3.1.849.200907301327" status="integration" publication="20090730132735"/>
+  <info organisation="xuggle" module="xuggle-xuggler-red5" revision="3.1.866.200908051353" status="integration" publication="20090805135347"/>
   <configurations>
     <conf name="default"/>
     
@@ -12,7 +12,7 @@
   </publications>
   <dependencies defaultconfmapping="*->*">
     <!-- Our internal libraries -->
-    <dependency org="xuggle" name="xuggle-utils" rev="1.21.833" revConstraint="latest.integration"/>
+    <dependency org="xuggle" name="xuggle-utils" rev="1.21.843.200908041119" revConstraint="latest.integration"/>
 
     <!-- Only bring this dependency in when compiling; you must
     install xuggle-xuggler on the Red5 server's root directory
