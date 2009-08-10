@@ -35,8 +35,29 @@ implements IAsynchronousEventDispatcher
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private Thread mDispatchThread;
-  private Queue<IEvent> mEventQueue;
+  private final Queue<IEvent> mEventQueue;
 
+  private final String mThreadName;
+  
+  /**
+   * Creates a {@link AsynchronousEventDispatcher}.
+   * @param threadName The name to use for the thread started.
+   * @param autoStartDispatching Should the constructor call {@link #startDispatching()}
+   *   immediately.
+   */
+  public AsynchronousEventDispatcher(
+      String threadName,
+      boolean autoStartDispatching)
+  {
+    if (threadName == null)
+      threadName = "DispatcherThread_"+this.hashCode();
+    mThreadName = threadName;
+    mDispatchThread = null;
+    mEventQueue = new LinkedList<IEvent>();
+    this.setupDispatching();
+    if (autoStartDispatching)
+      this.startDispatching();
+  }
   /**
    * Create a new event dispatcher
    * @param autoStartDispatching If true, we start dispatching upon creation.  If false, we don't.
@@ -45,12 +66,7 @@ implements IAsynchronousEventDispatcher
       boolean autoStartDispatching
       )
   {
-    mDispatchThread = null;
-    mEventQueue = new LinkedList<IEvent>();
-    this.setupDispatching();
-    if (autoStartDispatching)
-      this.startDispatching();
-
+    this(null, autoStartDispatching);
   }
 
   /**
@@ -69,7 +85,7 @@ implements IAsynchronousEventDispatcher
         runDispatcherThread();
       }
 
-    }, "DispatcherThread");
+    }, mThreadName);
   }
 
   public synchronized void startDispatching()
