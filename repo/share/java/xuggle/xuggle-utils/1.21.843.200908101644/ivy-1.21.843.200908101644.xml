@@ -1,6 +1,6 @@
 <ivy-module version="2.0">
 
-  <info organisation="xuggle" module="xuggle-utils" revision="1.21.788" status="integration" publication="20090706214327"/>
+  <info organisation="xuggle" module="xuggle-utils" revision="1.21.843.200908101644" status="integration" publication="20090810164451"/>
 
   <configurations>
     <conf name="default" description="default configuration"/>
