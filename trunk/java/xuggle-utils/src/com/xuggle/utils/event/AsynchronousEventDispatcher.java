@@ -71,6 +71,16 @@ implements IAsynchronousEventDispatcher
 
   /**
    * Create a new object, but don't start dispatching automatically.
+   * @param threadName the name to give the thread we start up.
+   */
+  public AsynchronousEventDispatcher(
+      String threadName)
+  {
+    this(threadName, false);
+  }
+  
+  /**
+   * Create a new object, but don't start dispatching automatically.
    */
   public AsynchronousEventDispatcher()
   {
