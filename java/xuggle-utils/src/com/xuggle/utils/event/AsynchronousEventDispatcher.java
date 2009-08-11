@@ -38,6 +38,20 @@ implements IAsynchronousEventDispatcher
   private final Queue<IEvent> mEventQueue;
 
   private final String mThreadName;
+
+  /*
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder b = new StringBuilder();
+    b.append(super.toString());
+    b.append("[").append(mThreadName).append("];");
+    return b.toString();
+  }
   
   /**
    * Creates a {@link AsynchronousEventDispatcher}.
