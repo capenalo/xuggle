@@ -110,6 +110,7 @@ implements IAsynchronousEventDispatcher
       }
 
     }, mThreadName);
+    mDispatchThread.setDaemon(true);
   }
 
   public synchronized void startDispatching()
@@ -130,6 +131,11 @@ implements IAsynchronousEventDispatcher
   public void stopDispatching()
   {
     this.dispatchEvent(new EventDispatcherStopEvent(this));
+  }
+
+  public void abortDispatching()
+  {
+    this.dispatchEvent(new EventDispatcherAbortEvent(this));
   }
 
   public void waitForDispatcherToFinish(long timeout)

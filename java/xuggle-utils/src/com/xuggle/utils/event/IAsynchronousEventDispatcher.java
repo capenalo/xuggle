@@ -33,10 +33,18 @@ public interface IAsynchronousEventDispatcher extends IEventDispatcher
 
   /**
    * If running a dispatcher in a separate thread, this will
-   * tell that thread to stop running.
+   * tell that thread to stop running.  All events currently
+   * in the queue will be dispatched first.
    */
   
   public abstract void stopDispatching();
+
+  /**
+   * If running a dispatcher in a separate thread, this will
+   * tell that thread to abort.  All event currently in the
+   * queue will be discarded without dispatching.
+   */
+  public void abortDispatching();
 
   /**
    * Waits for the dispatcher thread
