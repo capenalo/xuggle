@@ -1,5 +1,5 @@
 <ivy-module version="1.0">
-  <info organisation="xuggle" module="xuggle-xuggler-red5" revision="3.1.866.200908051353" status="integration" publication="20090805135347"/>
+  <info organisation="xuggle" module="xuggle-xuggler-red5" revision="3.1.875.200908131110" status="integration" publication="20090813111011"/>
   <configurations>
     <conf name="default"/>
     
