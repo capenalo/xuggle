@@ -227,8 +227,7 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
 
           msg.setBody(rtmpEvent);
           if (mCreationTime == null)
-            mCreationTime = (long)
-            (rtmpEvent.getTimestamp() + rtmpEvent.getExtendedTimestamp()<<24);
+            mCreationTime = (long)rtmpEvent.getTimestamp();
           try
           {
             if (event instanceof AudioData)
