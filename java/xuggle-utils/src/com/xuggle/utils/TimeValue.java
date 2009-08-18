@@ -39,13 +39,24 @@ import java.util.concurrent.TimeUnit;
  */
 public final class TimeValue implements Comparable<TimeValue>
 {
-  private final long mValue;
-  private final TimeUnit mUnit;
+  private long mValue;
+  private TimeUnit mUnit;
+
+  public TimeValue()
+  {
+    setValue(0);
+    setUnit(TimeUnit.MILLISECONDS);
+  }
   
   public TimeValue(long aValue, TimeUnit aUnit)
   {
-    mValue = aValue;
-    mUnit = aUnit;
+    setValue(aValue);
+    setUnit(aUnit);
+  }
+  
+  public TimeValue(long value, String unit)
+  {
+    this(value, TimeUnit.valueOf(unit));
   }
  
   /**
@@ -74,8 +85,8 @@ public final class TimeValue implements Comparable<TimeValue>
   {
     if (aSrc == null)
       throw new IllegalArgumentException("must pass valid time value");
-    mValue = aSrc.mValue;
-    mUnit = aSrc.mUnit;
+    setValue(aSrc.getValue());
+    setUnit(aSrc.getUnit());
   }
 
   public long get(TimeUnit aUnit)
@@ -83,17 +94,17 @@ public final class TimeValue implements Comparable<TimeValue>
     if (aUnit == null)
       throw new IllegalArgumentException("must pass valid TimeUnit");
     
-    return aUnit.convert(mValue, mUnit);
+    return aUnit.convert(getValue(), getUnit());
   }
   
   public TimeUnit getTimeUnit()
   {
-    return mUnit;
+    return getUnit();
   }
   
   public TimeValue copy()
   {
-    return new TimeValue(mValue, mUnit);
+    return new TimeValue(getValue(), getUnit());
   }
   
   public int compareTo(TimeValue that)
@@ -115,13 +126,13 @@ public final class TimeValue implements Comparable<TimeValue>
     // See http://www.javaworld.com/javaworld/jw-01-1999/jw-01-object.html?page=4 if
     // you want to know why that's important
    
-    TimeUnit minUnit = mUnit;
+    TimeUnit minUnit = getUnit();
     
-    if (that.mUnit.ordinal() < minUnit.ordinal())
-      minUnit = that.mUnit;
+    if (that.getUnit().ordinal() < minUnit.ordinal())
+      minUnit = that.getUnit();
     
-    long thisNs = minUnit.convert(this.mValue, this.mUnit);
-    long thatNs = minUnit.convert(that.mValue, that.mUnit);
+    long thisNs = minUnit.convert(this.getValue(), this.getUnit());
+    long thatNs = minUnit.convert(that.getValue(), that.getUnit());
     
     final long maxDistance = Long.MAX_VALUE / 2;
     int adjustment = 1;
@@ -148,7 +159,7 @@ public final class TimeValue implements Comparable<TimeValue>
   @Override
   public int hashCode()
   {
-    return (int)TimeUnit.NANOSECONDS.convert(mValue, mUnit);
+    return (int)TimeUnit.NANOSECONDS.convert(getValue(), getUnit());
   }
   
   /**
@@ -159,7 +170,47 @@ public final class TimeValue implements Comparable<TimeValue>
   public String toString()
   {
     NumberFormat format = new DecimalFormat("###,###,###,###,###,###,###");
-    String s = format.format(mValue);
-    return s + " (" + mUnit + ")";
+    String s = format.format(getValue());
+    return s + " (" + getUnit() + ")";
+  }
+
+  /**
+   * Sets the raw value; Should only be used by Bean factories.
+   * {@link TimeValue} objects are meant to be immutable once
+   * created.
+   * @param value the value to set
+   */
+  public void setValue(long value)
+  {
+    mValue = value;
+  }
+
+  /**
+   * Gets the raw value; Should only be used by Bean factories.
+   * @return the value
+   */
+  public long getValue()
+  {
+    return mValue;
+  }
+
+  /**
+   * Sets the raw unit; Should only be used by Bean factories.
+   * {@link TimeValue} objects are meant to be immutable once
+   * created.
+   * @param unit the unit to set
+   */
+  public void setUnit(TimeUnit unit)
+  {
+    mUnit = unit;
+  }
+
+  /**
+   * Gets the raw unit; Should only be used by Bean factories.
+   * @return the unit
+   */
+  public TimeUnit getUnit()
+  {
+    return mUnit;
   }
 }
