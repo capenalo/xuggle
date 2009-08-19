@@ -156,7 +156,7 @@ public class SynchronousEventDispatcherTest
     assertTrue(dispatcher != null);
     dispatcher.addEventHandler(1, TestEvent.class, handler1);
     // 2 is higher priority, and hence should always trump 1
-    dispatcher.addEventHandler(0, TestEvent.class, handler2);
+    dispatcher.addEventHandler(2, TestEvent.class, handler2);
 
     TestEvent event = new TestEvent();
     assertTrue(event.mHandlerNo == -1);
