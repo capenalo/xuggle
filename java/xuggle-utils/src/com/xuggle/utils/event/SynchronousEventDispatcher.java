@@ -108,17 +108,11 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     }
 
     /**
-     * Remove an event handler, and also remove an weak references that are no
-     * longer reachable at the given priority
+     * Remove an event handler
      * 
-     * @param key
+     * @param key the key as returned from {@link IEventDispatcher#addEventHandler(int, Class, IEventHandler, boolean)}.
      * 
-     * @param priority the priority to search in
-     * @param handler if non null, we'll remove one instance of this handler. If
-     *        null, we'll just remove all weak references that are no longer
-     *        reachable.
-     * 
-     * @throws IndexOutOfBoundsException if handler != null but it wasn't found
+     * @throws IndexOutOfBoundsException if handler wasn't found
      *         for removal
      */
     public void removeEventHandler(InternalKey key)
