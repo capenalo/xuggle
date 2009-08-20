@@ -19,11 +19,12 @@
 
 package com.xuggle.utils.event;
 
-import java.util.LinkedList;
 import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.xuggle.utils.queue.ArrayQueue;
 
 /**
  * The standard implementation of {@link IAsynchronousEventDispatcher}.
@@ -67,7 +68,7 @@ implements IAsynchronousEventDispatcher
       threadName = "DispatcherThread_"+this.hashCode();
     mThreadName = threadName;
     mDispatchThread = null;
-    mEventQueue = new LinkedList<IEvent>();
+    mEventQueue = new ArrayQueue<IEvent>(50);
     this.setupDispatching();
     if (autoStartDispatching)
       this.startDispatching();
