@@ -1,20 +1,19 @@
 /*
- * Copyright (c) 2008, 2009 by Xuggle Incorporated.  All rights reserved.
+ * Copyright (c) 2008, 2009 by Xuggle Incorporated. All rights reserved.
  * 
  * This file is part of Xuggler.
  * 
  * You can redistribute Xuggler and/or modify it under the terms of the GNU
- * Affero General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any
- * later version.
+ * Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  * 
- * Xuggler is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
- * License for more details.
+ * Xuggler is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  * 
  * You should have received a copy of the GNU Affero General Public License
- * along with Xuggler.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Xuggler. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.xuggle.utils.event;
@@ -31,7 +30,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicLong;
+
+import com.xuggle.utils.queue.ArrayQueue;
 
 /**
  * A synchronous implementation of {@link IEventDispatcher}.
@@ -41,9 +41,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * </p>
  * <p>
  * This object that any {@link IEvent} dispatched to this
- * {@link IEventDispatcher} by an {@link IEventHandler} currently being
- * executed by this {@link IEventDispatcher} will not actually be handled
- * until the current {@link IEventHandler} has returned.
+ * {@link IEventDispatcher} by an {@link IEventHandler} currently being executed
+ * by this {@link IEventDispatcher} will not actually be handled until the
+ * current {@link IEventHandler} has returned.
  * </p>
  * <p>
  * That means, even if a handler caused a new {@link IEvent} to be dispatched,
@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * </p>
  * 
  * @author aclarke
- *
+ * 
  */
 public class SynchronousEventDispatcher implements IEventDispatcher
 {
@@ -110,10 +110,11 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     /**
      * Remove an event handler
      * 
-     * @param key the key as returned from {@link IEventDispatcher#addEventHandler(int, Class, IEventHandler, boolean)}.
+     * @param key the key as returned from
+     *        {@link IEventDispatcher#addEventHandler(int, Class, IEventHandler, boolean)}
+     *        .
      * 
-     * @throws IndexOutOfBoundsException if handler wasn't found
-     *         for removal
+     * @throws IndexOutOfBoundsException if handler wasn't found for removal
      */
     public void removeEventHandler(InternalKey key)
     {
@@ -195,148 +196,156 @@ public class SynchronousEventDispatcher implements IEventDispatcher
     }
   }
 
-  private final AtomicLong mNumNestedEventDispatches = new AtomicLong(0L);
+  private int mNumNestedEventDispatches = 0;
 
   private final Map<String, ClassHandler> mHandlers = new HashMap<String, ClassHandler>();
 
-  private final Queue<IEvent> mPendingEventDispatches = new LinkedList<IEvent>();
+  private final Queue<IEvent> mPendingEventDispatches = new ArrayQueue<IEvent>();
 
+  /**
+   * @{inheritDoc . This method is CRAZY hot and has been extensively optimized;
+   *              don't make any changes here without reviewing them with
+   *              another person. If you can, pre-compute elements during
+   *              {@link #addEventHandler(int, Class, IEventHandler, boolean)}
+   *              or
+   *              {@link #removeEventHandler(com.xuggle.utils.event.IEventHandlerRegistrable.Key)}
+   *              calls.
+   * 
+   */
   @SuppressWarnings("unchecked")
   public void dispatchEvent(IEvent event)
   {
-    long dispatcherNum = mNumNestedEventDispatches.incrementAndGet();
+    final long dispatcherNum = ++mNumNestedEventDispatches;
     final IEvent origEvent = event;
     try
     {
-      if (event == null)
-        throw new IllegalArgumentException("cannot dispatch null event");
-
       // log.debug("dispatching event: {}", event);
       // do one acquire for adding to the queue
       origEvent.acquire();
-      mPendingEventDispatches.add(origEvent);
+      mPendingEventDispatches.offer(origEvent);
+      if (dispatcherNum != 1)
+        return;
       // don't process a dispatch if nested within a dispatchEvent() call;
       // wait for the stack to unwind, and then process it.
-      while (!Thread.currentThread().isInterrupted() && dispatcherNum == 1
-          && (event = mPendingEventDispatches.poll()) != null)
+      while ((event = mPendingEventDispatches.poll()) != null)
       {
-        boolean eventHandled = false;
-        // First, determine all the valid handlers
-
-        // find our registered handlers.
-        final String className = event.getClass().getName();
-        if (className == null)
-          throw new IllegalArgumentException("cannot get class name for event");
-
-        // self handlers ARE ALWAYS called first
-        if (event instanceof ISelfHandlingEvent<?>)
+        try
         {
-          ISelfHandlingEvent<IEvent> handler = (ISelfHandlingEvent<IEvent>) event;
-          try
+          // self handlers ARE ALWAYS called first
+          if (event instanceof ISelfHandlingEvent<?>)
           {
-            if (handler.handleEvent(this, event))
-              // done handling this event
-              continue;
-          }
-          catch (AssertionError t)
-          {
-            // to enable tests to continue working, we dispatch an event but
-            // rethrow.
-            dispatchEvent(new ErrorEvent(event.getSource(), t,
-                "uncaught exception", event, handler));
-            throw t;
-          }
-          catch (Throwable t)
-          {
-            dispatchEvent(new ErrorEvent(event.getSource(), t,
-                "uncaught exception", event, handler));
-          }
-        }
-        final InternalKey[] keys;
-        final Object[] handlers;
-        // hold for minimum amount of time
-        synchronized (mHandlers)
-        {
-          ClassHandler classHandler = mHandlers.get(className);
-          if (classHandler != null)
-          {
-            keys = classHandler.getSortedKeys();
-            handlers = classHandler.getSortedHandlers();
-          }
-          else
-          {
-            keys = null;
-            handlers = null;
-          }
-        }
-        final int numHandlers = keys == null ? 0 : keys.length;
-//        log.trace("Handling event: {} with {} handlers", event, numHandlers);
-        for (int i = 0; i < numHandlers; i++)
-        {
-          final Object handler = handlers[i];
-          if (eventHandled)
-            break;
-          // log.debug("Handling event: {} with handler: {}", event, handler);
-          final IEventHandler<IEvent> actualHandler;
-          if (handler instanceof WeakReference<?>)
-          {
-            actualHandler = ((WeakReference<IEventHandler<IEvent>>) handler)
-                .get();
-            if (actualHandler == null)
+            ISelfHandlingEvent<IEvent> handler = (ISelfHandlingEvent<IEvent>) event;
+            try
             {
-              // This has expired; remove it.
-              final InternalKey removeKey = keys[i];
-              dispatchEvent(new SelfHandlingEvent<IEvent>(this)
-              {
-                public boolean handleEvent(IEventDispatcher aDispatcher,
-                    IEvent aEvent)
-                {
-                  try
-                  {
-                    SynchronousEventDispatcher.this
-                        .removeEventHandler(removeKey);
-                  }
-                  catch (IndexOutOfBoundsException e)
-                  {
-                    // ignore if already removed
-                  }
-                  return false;
-                }
-              });
-              continue;
+              if (handler.handleEvent(this, event))
+                // done handling this event
+                continue;
+            }
+            catch (AssertionError t)
+            {
+              // to enable tests to continue working, we dispatch an event but
+              // rethrow.
+              dispatchEvent(new ErrorEvent(event.getSource(), t,
+                  "uncaught exception", event, handler));
+              throw t;
+            }
+            catch (Throwable t)
+            {
+              dispatchEvent(new ErrorEvent(event.getSource(), t,
+                  "uncaught exception", event, handler));
             }
           }
-          else
+          final InternalKey[] keys;
+          final Object[] handlers;
+          // hold for minimum amount of time
+          // find our registered handlers.
+          final String className = event.getClass().getName();
+
+          synchronized (mHandlers)
           {
-            actualHandler = (IEventHandler<IEvent>) handler;
+            final ClassHandler classHandler = mHandlers.get(className);
+            if (classHandler != null)
+            {
+              keys = classHandler.getSortedKeys();
+              handlers = classHandler.getSortedHandlers();
+            }
+            else
+            {
+              keys = null;
+              handlers = null;
+            }
           }
-          try
+          final int numHandlers = keys != null ? keys.length : 0;
+          // log.trace("Handling event: {} with {} handlers", event,
+          // numHandlers);
+          boolean eventHandled = false;
+          for (int i = 0; i < numHandlers && !eventHandled; ++i)
           {
-            eventHandled = actualHandler.handleEvent(this, event);
-          }
-          catch (AssertionError t)
-          {
-            // to enable tests to continue working, we dispatch an event but
-            // rethrow.
-            dispatchEvent(new ErrorEvent(event.getSource(), t,
-                "uncaught exception", event, actualHandler));
-            throw t;
-          }
-          catch (Throwable t)
-          {
-            dispatchEvent(new ErrorEvent(event.getSource(), t,
-                "uncaught exception", event, actualHandler));
+            final Object handler = handlers[i];
+            // log.debug("Handling event: {} with handler: {}", event, handler);
+            final IEventHandler<IEvent> actualHandler;
+            if (handler instanceof WeakReference<?>)
+            {
+              actualHandler = ((WeakReference<IEventHandler<IEvent>>) handler)
+                  .get();
+              if (actualHandler == null)
+              {
+                // This has expired; remove it.
+                final InternalKey removeKey = keys[i];
+                dispatchEvent(new SelfHandlingEvent<IEvent>(this)
+                {
+                  public boolean handleEvent(IEventDispatcher aDispatcher,
+                      IEvent aEvent)
+                  {
+                    try
+                    {
+                      SynchronousEventDispatcher.this
+                          .removeEventHandler(removeKey);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                      // ignore if already removed
+                    }
+                    return false;
+                  }
+                });
+                continue;
+              }
+            }
+            else
+            {
+              actualHandler = (IEventHandler<IEvent>) handler;
+            }
+            try
+            {
+              eventHandled = actualHandler.handleEvent(this, event);
+            }
+            catch (AssertionError t)
+            {
+              // to enable tests to continue working, we dispatch an event but
+              // rethrow.
+              dispatchEvent(new ErrorEvent(event.getSource(), t,
+                  "uncaught exception", event, actualHandler));
+              throw t;
+            }
+            catch (Throwable t)
+            {
+              dispatchEvent(new ErrorEvent(event.getSource(), t,
+                  "uncaught exception", event, actualHandler));
+            }
           }
         }
-        // do one release for finishing the handle
-        event.release();
-        // log.debug("Handling event: {} done", event);
-
+        finally
+        {
+          // do one release for finishing the handle
+          event.release();
+          // log.debug("Handling event: {} done", event);
+        }
       }
     }
     finally
     {
-      mNumNestedEventDispatches.decrementAndGet();
+      mNumNestedEventDispatches--;
     }
   }
 
