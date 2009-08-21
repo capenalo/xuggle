@@ -202,6 +202,8 @@ public final class TimeValue implements Comparable<TimeValue>
    */
   public void setUnit(TimeUnit unit)
   {
+    if (unit == null)
+      throw new IllegalArgumentException("must specify unit");
     mUnit = unit;
   }
 
