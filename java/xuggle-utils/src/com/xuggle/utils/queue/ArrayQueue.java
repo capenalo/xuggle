@@ -68,18 +68,16 @@ public class ArrayQueue<E> extends AbstractQueue<E> implements Queue<E>
   private void growQueue()
   {
     E[] newQueue = (E[])new Object[mQueue.length*2];
-    for(int i = 0; i < mSize; i++, mFront = increment(mFront))
+    for(int i = 0; i < mSize; i++)
+    {
       newQueue[i] = mQueue[mFront];
+      mFront++;
+      if (mFront == mQueue.length)
+        mFront = 0;
+    }
     mFront = 0;
     mBack = mSize -1;
     mQueue = newQueue;
-  }
-  private int increment(final int pos)
-  {
-    final int incr = pos+1;
-    if (incr== mQueue.length)
-      return 0;
-    return incr;
   }
   private int getOffset(final int index)
   {
@@ -162,7 +160,9 @@ public class ArrayQueue<E> extends AbstractQueue<E> implements Queue<E>
   {
     if (mSize == mQueue.length)
       growQueue();
-    mBack = increment(mBack);
+    mBack++;
+    if (mBack == mQueue.length)
+      mBack = 0;
     mQueue[mBack] = obj;
     mSize++;
     return true;
@@ -180,7 +180,10 @@ public class ArrayQueue<E> extends AbstractQueue<E> implements Queue<E>
     mSize--;
     E retval = mQueue[mFront];
     mQueue[mFront] = null; // clear the reference
-    mFront = increment(mFront);
+    mFront++;
+    if (mFront == mQueue.length)
+      mFront = 0;
+
     return retval;
   }
 
