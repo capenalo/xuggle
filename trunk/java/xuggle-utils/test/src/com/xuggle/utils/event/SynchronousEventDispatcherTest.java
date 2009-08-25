@@ -177,7 +177,6 @@ public class SynchronousEventDispatcherTest
     }
     class Aunt extends Event
     {
-      @SuppressWarnings("unused")
       public Aunt() { super(null); }
     }
     class Child extends Parent
@@ -335,7 +334,6 @@ public class SynchronousEventDispatcherTest
 
     class TestEvent extends Event
     {
-      @SuppressWarnings("unused")
       public TestEvent(Object source) { super(source); }
     }
     final IEventHandler<TestEvent> wrongHandler = new IEventHandler<TestEvent>()
