@@ -282,6 +282,10 @@ public class Transcoder implements Runnable
           IRTMPEvent event = aMsg.getData();
           if (event != null)
           {
+            // we've live.  Tell Red5 that
+            // this is only in the xuggler_timestamp_branch for now, so we leave commented out
+            //event.setSourceType((byte)1);
+
             if (event instanceof AudioData)
             {
               log.debug("  broadcasting packet type: {}; ts: {}; on stream: {}",
