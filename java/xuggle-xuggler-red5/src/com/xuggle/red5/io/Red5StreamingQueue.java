@@ -98,9 +98,9 @@ implements IRTMPEventIOHandler
           {
             if (mReadTimeout == null)
             {
-              result = this.take();
+              result = super.take();
             } else {
-              result = this.poll(mReadTimeout.get(TimeUnit.MICROSECONDS), TimeUnit.MICROSECONDS);
+              result = super.poll(mReadTimeout.get(TimeUnit.MICROSECONDS), TimeUnit.MICROSECONDS);
             }
           }
           finally
@@ -127,11 +127,11 @@ implements IRTMPEventIOHandler
     try {
       if (mWriteTimeout==null)
       {
-        this.put(msg);
+        super.put(msg);
       }
       else
       {
-        this.offer(msg, mWriteTimeout.get(TimeUnit.MICROSECONDS), TimeUnit.MICROSECONDS);
+        super.offer(msg, mWriteTimeout.get(TimeUnit.MICROSECONDS), TimeUnit.MICROSECONDS);
       }
     } finally {
       point.collect();
