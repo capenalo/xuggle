@@ -18,8 +18,7 @@
  */
 
 /**
- * A a decoupled event-dispatcher/event-handler implementation similar
- * to the EventDispatcher model used in Flash ActionScript.
+ * Xuggle collection classes that supplement the Java JDK collections class.
  */
-package com.xuggle.utils.event;
+package com.xuggle.utils.collections;
 
