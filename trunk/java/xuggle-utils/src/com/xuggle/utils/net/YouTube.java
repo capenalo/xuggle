@@ -89,6 +89,7 @@ public class YouTube
     }
     in = new BufferedInputStream(conn.getInputStream());      
     in.read(data);
+    conn.disconnect();
     // convert to string; ugh
     String response = new String(data, "UTF-8");
     // convert into parameter map
@@ -103,6 +104,7 @@ public class YouTube
     final String location = host + "/get_video?"+URLParams.generateQueryString(params);
     map.put("location", location);
     map.putAll(youTubeParams);
+ 
   }
   
   /**
