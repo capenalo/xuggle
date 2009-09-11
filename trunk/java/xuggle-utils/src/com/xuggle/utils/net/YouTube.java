@@ -112,7 +112,7 @@ public class YouTube
    * @param youTubeId A youtube video identifier, e.g. "nQm-O6jiNsY"
    * @return The URL
    */
-  public String getLocation(String youTubeId)
+  public static String getLocation(String youTubeId)
   {
     try
     {
