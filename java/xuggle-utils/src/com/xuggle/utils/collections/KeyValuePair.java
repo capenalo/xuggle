@@ -68,7 +68,7 @@ public class KeyValuePair implements IKeyValuePair, Entry<String, String>
   }
 
   /**
-   * @{inheritDoc}
+   * {@inheritDoc}
    */
   public String setValue(String value)
   {

@@ -101,7 +101,7 @@ public class URLParams
    * 
    * @param queryString
    *          The query string (without leading "?").
-   * @param paramsToFill
+   * @param parametersToFill
    *          A list to add entries to; the list is not emptied first by this
    *          method. Entries are added in the order they are found.
    * @param encoding

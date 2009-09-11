@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 public class MapUtils
 {
   /**
-   * How {@link MapUtils#listToMap(List, Map, ListToMapMode) treats
+   * How {@link MapUtils#listToMap(List, Map, ListToMapMode)} treats
    * duplicate values in the input list.
    * @author aclarke
    *
