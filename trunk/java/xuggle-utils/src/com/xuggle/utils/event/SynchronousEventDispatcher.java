@@ -203,7 +203,8 @@ public class SynchronousEventDispatcher implements IEventDispatcher
   private final Queue<IEvent> mPendingEventDispatches = new ArrayQueue<IEvent>();
 
   /**
-   * @{inheritDoc . This method is CRAZY hot and has been extensively optimized;
+   * {@inheritDoc}
+   *  This method is CRAZY hot and has been extensively optimized;
    *              don't make any changes here without reviewing them with
    *              another person. If you can, pre-compute elements during
    *              {@link #addEventHandler(int, Class, IEventHandler, boolean)}
