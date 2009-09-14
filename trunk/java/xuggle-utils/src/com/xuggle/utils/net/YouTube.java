@@ -87,11 +87,15 @@ public class YouTube
       conn.disconnect();
       throw new RuntimeException("could not get video info: " + urlString);
     }
-    in = new BufferedInputStream(conn.getInputStream());      
-    in.read(data);
+    in = new BufferedInputStream(conn.getInputStream());
+    int offset=0;
+    do {
+      offset = in.read(data, offset, data.length-offset);
+    } while(offset >= 0 && offset < data.length);
     conn.disconnect();
     // convert to string; ugh
     String response = new String(data, "UTF-8");
+    System.out.println("Response: "+response);
     // convert into parameter map
     final Map<String, String> youTubeParams = MapUtils.listToMap(URLParams.parseQueryString(response), ListToMapMode.FIRST_WINS);
     final String token = youTubeParams.get("token");
