@@ -79,7 +79,7 @@ public class YouTube
     }
     HttpURLConnection conn;
     BufferedInputStream in;
-    byte[] data = new byte[4096]; // bad Art; fixed size
+    byte[] data = new byte[8192]; // bad Art; fixed size
     
     conn = (HttpURLConnection)url.openConnection();
     if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
