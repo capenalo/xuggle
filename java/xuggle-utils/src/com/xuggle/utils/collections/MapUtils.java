@@ -49,6 +49,14 @@ public class MapUtils
      * First item in list always wins.
      */
     FIRST_WINS,
+    /**
+     * First non-null, non zero-length string wins.
+     */
+    FIRST_NONEMPTY_WINS,
+    /**
+     * Last non-null, non zero-length string wins.
+     */
+    LAST_NONEMPTY_WINS,
   }
 
   /**
@@ -75,12 +83,32 @@ public class MapUtils
     {
       if (pair != null)
       {
+        final String key = pair.getKey();
+        final String value = pair.getValue();
         if (mode == ListToMapMode.FIRST_WINS)
         {
-          if (mapToFill.containsKey(pair.getKey()))
+          if (mapToFill.containsKey(key))
             continue;
         }
-        mapToFill.put(pair.getKey(), pair.getValue());
+        if (mode == ListToMapMode.FIRST_NONEMPTY_WINS)
+        {
+          if (mapToFill.containsKey(key))
+          {
+            final String oldValue = mapToFill.get(key);
+            if(oldValue != null && oldValue.length() > 0)
+            // the list has a non-null value; don't reset it.
+              continue;
+          }
+        }
+        if (mode == ListToMapMode.LAST_NONEMPTY_WINS)
+        {
+          if (value == null || value.length() == 0) {
+            if (mapToFill.containsKey(key))
+              // already contains an empty key
+              continue;
+          }
+        }
+        mapToFill.put(key, value);
       }
     }
   }
