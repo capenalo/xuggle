@@ -89,12 +89,15 @@ public class YouTube
     }
     in = new BufferedInputStream(conn.getInputStream());
     int offset=0;
+    int len=0;
     do {
       offset = in.read(data, offset, data.length-offset);
+      if (offset > 0)
+        len+= offset;
     } while(offset >= 0 && offset < data.length);
     conn.disconnect();
     // convert to string; ugh
-    String response = new String(data, "UTF-8");
+    String response = new String(data, 0, len, "UTF-8");
     System.out.println("Response: "+response);
     // convert into parameter map
     final Map<String, String> youTubeParams = MapUtils.listToMap(URLParams.parseQueryString(response), ListToMapMode.FIRST_WINS);
