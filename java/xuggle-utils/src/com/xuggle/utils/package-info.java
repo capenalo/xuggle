@@ -16,6 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Xuggler.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+/**
+ * Utility classes that are used through Xuggler and other Xuggle.com
+ * source code.
+ */
 package com.xuggle.utils;
 
