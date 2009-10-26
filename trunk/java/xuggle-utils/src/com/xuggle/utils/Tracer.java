@@ -16,28 +16,40 @@ import java.util.concurrent.TimeUnit;
  */
 public class Tracer
 {
+  /**
+   * Implementation note: For performance reasons Tracer's SHOULD
+   * be 100% immutable and should pre-compute values if cheap to
+   * do so.  Trust me on that.
+   */
   final private UUID mID;
   final private Object mSource;
   final private Object mMessage;
   final private TimeValue mTimeStamp;
+  final private long mElapsedNanoSeconds;
+  final private TimeValue mElapsedTime;
   final private Tracer mParent;
   
   private Tracer(Object source, Object message, TimeValue timestamp, Tracer parent)
   {
     if (source == null)
       throw new NullPointerException();
-    if (parent == null) {
-      mID = UUID.randomUUID();
-      mParent = null;
-    } else {
-      mID = parent.getID();
-      mParent = parent;
-    }
     mSource = source;
     mMessage = message;
     if (timestamp == null)
       timestamp = TimeValue.nanoNow();
     mTimeStamp = timestamp;
+    if (parent == null) {
+      mID = UUID.randomUUID();
+      mParent = null;
+      mElapsedNanoSeconds = 0;
+    } else {
+      mID = parent.getID();
+      mParent = parent;
+      mElapsedNanoSeconds = timestamp.get(TimeUnit.NANOSECONDS)
+        - mParent.getTimeStamp().get(TimeUnit.NANOSECONDS)
+        + mParent.mElapsedNanoSeconds;
+    }
+    mElapsedTime = new TimeValue(mElapsedNanoSeconds, TimeUnit.NANOSECONDS);
   }
   
   /**
@@ -158,7 +170,7 @@ public class Tracer
   /**
    * Creates an XML string version of the tracer.
    * <p>
-   * Time stamps are printed as {@link TimeUnit#MICROSECONDS} unless otherwise specified
+   * Time stamps are printed as {@link TimeUnit#NANOSECONDS} unless otherwise specified
    * with a unit attribute. 
    * </p>
    * @return An XML string.
@@ -180,10 +192,20 @@ public class Tracer
     builder.append(mTimeStamp.getValue());
     builder.append("\"");
     
-    TimeUnit unit = mTimeStamp.getUnit();
-    if (!TimeUnit.MICROSECONDS.equals(unit)) {
+    final TimeUnit unit = mTimeStamp.getUnit();
+    if (!TimeUnit.NANOSECONDS.equals(unit)) {
       builder.append(" unit=\"");
       builder.append(mTimeStamp.getUnit());
+      builder.append("\"");
+    }
+    builder.append(" elapsed=\"");
+    builder.append(mElapsedTime.getValue());
+    builder.append("\"");
+    
+    final TimeUnit elapsedunit = mElapsedTime.getUnit();
+    if (!TimeUnit.NANOSECONDS.equals(elapsedunit)) {
+      builder.append(" elapsedunit=\"");
+      builder.append(mElapsedTime.getUnit());
       builder.append("\"");
     }
     builder.append(">");
@@ -196,6 +218,7 @@ public class Tracer
       builder.append(mMessage);
       builder.append("</message>");
     }
+    
     if (mParent != null)
     {
       //FIXME: Should do loop detection here
@@ -204,4 +227,15 @@ public class Tracer
     builder.append("</tracer>");
     return builder.toString();
   }
+
+  /**
+   * Get the time that has elapsed since the first instance
+   * of this {@link Tracer}.
+   * @return The time elapsed.
+   */
+  public TimeValue getElapsedTime()
+  {
+    return mElapsedTime;
+  }
+  
 }
