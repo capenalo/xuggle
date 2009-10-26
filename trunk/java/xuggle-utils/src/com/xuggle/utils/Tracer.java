@@ -39,6 +39,7 @@ public class Tracer
       timestamp = TimeValue.nanoNow();
     mTimeStamp = timestamp;
   }
+  
   /**
    * Create a new tracer.
    * @param source The source creating the tracer.  May not be null.
@@ -50,6 +51,27 @@ public class Tracer
   public Tracer(Object source, Object message, TimeValue timestamp)
   {
     this(source, message, timestamp, null);
+  }
+  
+  /**
+   * Create a new tracer.
+   * @param source The source creating the tracer.  May not be null.
+   * @param message An optional message; may be null.
+   * @throws NullPointerException if source == null
+   */
+  public Tracer(Object source, Object message)
+  {
+    this(source, message, null, null);
+  }
+  
+  /**
+   * Create a new tracer.
+   * @param source The source creating the tracer.  May not be null.
+   * @throws NullPointerException if source == null
+   */
+  public Tracer(Object source)
+  {
+    this(source, null, null, null);
   }
   
   /**
