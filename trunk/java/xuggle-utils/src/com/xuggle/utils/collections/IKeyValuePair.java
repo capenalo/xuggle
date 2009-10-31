@@ -20,7 +20,7 @@
 package com.xuggle.utils.collections;
 
 /**
- * A key-alue pair.
+ * A key-value pair.
  * 
  * @author aclarke
  * 
