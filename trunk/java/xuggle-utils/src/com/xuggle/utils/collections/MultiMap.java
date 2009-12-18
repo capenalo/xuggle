@@ -15,7 +15,7 @@ public class MultiMap<A, B> implements IMultiMap<A, B>
     mAtoB = new HashMap<A, Set<B>>();
     mBtoA = new HashMap<B, Set<A>>();
   }
-  public Set<A> getMappedA(B key)
+  public Set<A> getMappedA(final B key)
   {
     final Set<A> retval = mBtoA.get(key);
     if (retval == null)
