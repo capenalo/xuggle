@@ -166,6 +166,75 @@ public class Tracer
   {
     return mParent;
   }
+
+  /**
+   * Return the ancestor of a given tracer which matches a specific source
+   * object.
+   * 
+   * @param source the source object to match against
+   * @return the found ancestor or null of no matching ancestor found
+   */
+
+  public Tracer findAncestor(Object source)
+  {
+    Tracer current = this;
+    while (null != current)
+      if (current.getSource() == source)
+        return current;
+      else
+        current = current.getParent();
+
+    return null;
+  }
+  
+  /**
+   * Return the original tracer of this tracer.
+   * 
+   * @param source the source object to match against
+   * @return the found ancestor or null of no matching ancestor found
+   */
+
+  public Tracer findOriginator()
+  {
+    Tracer current = this;
+    
+    while (null != current.getParent())
+      current = current.getParent();
+
+    return current;
+  }
+
+  /**
+   * Compute the difference between this tracer and the one passed in. This
+   * function performs a simple subtraction between the time stamps: passed -
+   * this.
+   * 
+   * @param the the tracer to who's timestamp will be subtract from this
+   *        tracers time stamp.
+   * @param unit the unit of the desired result
+   * @return the difference between this tracer and the passed tracers time
+   *         stamps.
+   */
+
+  public long difference(Tracer tracer, TimeUnit unit)
+  {
+    return difference(this, tracer, unit);
+  }
+  
+  /**
+   * Compute the difference between two tracer's time stamps. This function
+   * performs a simple subtraction between the time stamps: b - a.
+   * 
+   * @param a the first tracer 
+   * @param b the second tracer
+   * @param unit the unit of the desired result
+   * @return the difference between the two tracers time stamps.
+   */
+
+  public static long difference(Tracer a, Tracer b, TimeUnit unit)
+  {
+    return b.getTimeStamp().get(unit) - a.getTimeStamp().get(unit);
+  }
   
   /**
    * Creates an XML string version of the tracer.
