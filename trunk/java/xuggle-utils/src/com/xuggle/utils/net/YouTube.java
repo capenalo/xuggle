@@ -41,6 +41,8 @@ import com.xuggle.utils.collections.MapUtils.ListToMapMode;
  */
 public class YouTube
 {
+  private YouTube() {}
+  
   /**
    * Gets all parameters we can figure out about this youTubeId by scraping YouTube.
    * The URL for the underlying video will have the key "location".
@@ -132,6 +134,10 @@ public class YouTube
       throw new RuntimeException("could not get location from youtube", e);
     }
   }
+  /**
+   * An example application showing how to use this class.
+   * @param args No arguments.
+   */
   public static void main(String[] args)
   {
     try
