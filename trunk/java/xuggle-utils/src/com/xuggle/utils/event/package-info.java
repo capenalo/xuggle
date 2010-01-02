@@ -18,8 +18,15 @@
  */
 
 /**
- * A a decoupled event-dispatcher/event-handler implementation similar
- * to the EventDispatcher model used in Flash ActionScript.
+ * A decoupled event-dispatcher/event-handler implementation similar to the
+ * EventDispatcher model used in Flash ActionScript. This set of classes can be
+ * used to create <a
+ * href="http://en.wikipedia.org/wiki/Event-driven_architecture"> Event Driven
+ * Architecture</a> based applications where event producers and event consumers
+ * are totally unaware of each other.
+ * <p>
+ * In fact, Xuggle's Octopus media server relies extensively on this class.
+ * </p>
  */
 package com.xuggle.utils.event;
 

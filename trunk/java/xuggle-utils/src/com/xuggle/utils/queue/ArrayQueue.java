@@ -49,11 +49,27 @@ public class ArrayQueue<E> extends AbstractQueue<E> implements Queue<E>
   private int mFront;
   private int mBack;
   
-  private static int DEFAULT_SIZE=10;
+  /**
+   * The default size of the queue used by the default constructor {@link #ArrayQueue()}.
+   */
+  public static int DEFAULT_SIZE=10;
+  
+  /**
+   * Create an {@link ArrayQueue} with a default starting capacity of
+   * {@link #DEFAULT_SIZE}.
+   */
   public ArrayQueue()
   {
     this(DEFAULT_SIZE);
   }
+
+  /**
+   * Create an {@link ArrayQueue} object.
+   * 
+   * @param startingCapacity
+   *          The starting queue capacity (i.e. the number of elements the queue
+   *          can hold until it has to be expanded).
+   */
   @SuppressWarnings("unchecked")
   public ArrayQueue(int startingCapacity)
   {
@@ -146,16 +162,25 @@ public class ArrayQueue<E> extends AbstractQueue<E> implements Queue<E>
     }
     
   }
+  /**
+   * {@inheritDoc}
+   */
   public Iterator<E> iterator()
   {
     return new ArrayQueueIterator<E>(this);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public int size()
   {
     return mSize;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public boolean offer(E obj)
   {
     if (mSize == mQueue.length)
@@ -168,11 +193,17 @@ public class ArrayQueue<E> extends AbstractQueue<E> implements Queue<E>
     return true;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public E peek()
   {
     return mSize == 0 ? null : mQueue[mFront];
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public E poll()
   {
     if (mSize == 0)
