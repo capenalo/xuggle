@@ -46,7 +46,7 @@ public class TargetedHandler<E extends IEvent> implements IEventHandler<E>
    *  
    *  @throws IllegalArgumentException if proxiedHandler == null
    */
-  protected TargetedHandler(Object source, IEventHandler<E> proxiedHandler)
+  TargetedHandler(Object source, IEventHandler<E> proxiedHandler)
   {
     mSource = source;
     if (proxiedHandler == null)

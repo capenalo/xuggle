@@ -49,7 +49,7 @@ public class HandlersTest
     TestEvent wrongEvent = new TestEvent(this);
 
     int maxCalls = 4;
-    IEventHandler<TestEvent> handler = Handler.getTargetedAndBoundedHandler(
+    IEventHandler<TestEvent> handler = Handler.makeTargetedAndBoundedHandler(
         source,
         maxCalls,
         new IEventHandler<TestEvent>(){
