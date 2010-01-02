@@ -20,27 +20,13 @@
 package com.xuggle.utils.sm;
 
 /**
- * This is the base Interface for ALL states in The Yard.
+ * This is the base Interface for ALL states.
  * 
  * @author trebor
  *
  */
 public interface IState
 {
-//     /** Register the state machine with which this state will be operate. 
-//      *
-//      * @param sm the state machine with which this state will be operate.
-//      */
-
-//     public void registerStateMachine(StateMachine sm);
-
-//     /** Get the registered state machine. 
-//      *
-//      * @return the registered state machine.
-//      */
-
-//     public StateMachine getSm();
-
     /** Get printable version of this state. 
      *
      * @return the string representation of this state.

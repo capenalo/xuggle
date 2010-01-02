@@ -43,15 +43,15 @@ public class StateMachine implements IEventHandlerRegistrable
 
     /** Current state of this state machine. */
 
-    private IState state = null;
+    private IState mState = null;
 
     /** The initial state of this state machine. */
 
-    private IState initialState = null;
+    private IState mInitialState = null;
 
     /** The event dispatcher used by this state machine. */
 
-    private IEventDispatcher eventDispatcher;
+    private IEventDispatcher mDispatcher;
 
     /** Construct a state machine.
      *
@@ -67,14 +67,14 @@ public class StateMachine implements IEventHandlerRegistrable
       // if a dispatcher has been passed us that otherwise create a
       // Synchronouseventdispatcher internally
       
-      this.eventDispatcher = (eventDispatcher == null
+      this.mDispatcher = (eventDispatcher == null
         ? new SynchronousEventDispatcher()
         : eventDispatcher);
 
       // set initial state
 
-      this.initialState = initialState;
-      this.state = initialState;
+      this.mInitialState = initialState;
+      this.mState = initialState;
     }
 
     /** Convience dipsatch function which just passes through to the
@@ -95,7 +95,7 @@ public class StateMachine implements IEventHandlerRegistrable
 
     public IEventDispatcher getEventDispatcher()
     {
-      return eventDispatcher;
+      return mDispatcher;
     }
 
     /** Sets the state of this state machine.  The transition will occur
@@ -106,11 +106,11 @@ public class StateMachine implements IEventHandlerRegistrable
 
     public void setState(IState target)
     {
-      IState from = state;
-      state = target;
-      log.debug("State change: " + from + " -> " + state);
+      IState from = mState;
+      mState = target;
+      log.debug("State change: " + from + " -> " + mState);
       IEvent event = newTransitionEvent(this, from, target);
-      eventDispatcher.dispatchEvent(event);
+      mDispatcher.dispatchEvent(event);
     }
 
     /**
@@ -135,7 +135,7 @@ public class StateMachine implements IEventHandlerRegistrable
     
     public IState getState()
     {
-      return state;
+      return mState;
     }
 
     /**
@@ -150,28 +150,28 @@ public class StateMachine implements IEventHandlerRegistrable
 
     public void reset(long timeout)
     {
-      eventDispatcher.dispatchEvent(new EventDispatcherAbortEvent(this));
+      mDispatcher.dispatchEvent(new EventDispatcherAbortEvent(this));
       
       // if event dispatcher is asynchronous, then wait for it to shut
       // down, then null the state, and then restart it
 
-      if (eventDispatcher instanceof AsynchronousEventDispatcher)
+      if (mDispatcher instanceof AsynchronousEventDispatcher)
       {
         AsynchronousEventDispatcher aed = 
-          (AsynchronousEventDispatcher)eventDispatcher;
+          (AsynchronousEventDispatcher)mDispatcher;
         aed.waitForDispatcherToFinish(timeout);
-        state = null;
+        mState = null;
         aed.startDispatching();
       }
 
       // owtherwise just null the state
 
       else
-        state = null;
+        mState = null;
 
       // dispatch transition to initial state
 
-      setState(initialState);
+      setState(mInitialState);
     }
 
     /**
@@ -181,8 +181,8 @@ public class StateMachine implements IEventHandlerRegistrable
     {
         /** Target state of this transition event. */
 
-        private IState from;
-        private IState to;
+        private IState mFrom;
+        private IState mTo;
 
         /** Construct a transition event
          *
@@ -194,8 +194,8 @@ public class StateMachine implements IEventHandlerRegistrable
         public TransitionEvent(Object source, IState from, IState to)
         {
           super(source);
-          this.from = from;
-          this.to = to;
+          this.mFrom = from;
+          this.mTo = to;
         }
 
         /** Get the state that the sm is transitioning from.
@@ -205,7 +205,7 @@ public class StateMachine implements IEventHandlerRegistrable
         
         public IState getFrom()
         {
-          return from;
+          return mFrom;
         }
 
         /** Get the state that the is sm transitioning to.
@@ -215,10 +215,13 @@ public class StateMachine implements IEventHandlerRegistrable
         
         public IState getTo()
         {
-          return to;
+          return mTo;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Key addEventHandler(int priority,
         Class<? extends IEvent> eventClass,
         IEventHandler<? extends IEvent> handler)
@@ -226,12 +229,18 @@ public class StateMachine implements IEventHandlerRegistrable
       return getEventDispatcher().addEventHandler(priority, eventClass, handler);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void removeEventHandler(Key key)
         throws IndexOutOfBoundsException
     {
       getEventDispatcher().removeEventHandler(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Key addEventHandler(int priority,
         Class<? extends IEvent> eventClass,
         IEventHandler<? extends IEvent> handler, boolean useWeakReferences)
