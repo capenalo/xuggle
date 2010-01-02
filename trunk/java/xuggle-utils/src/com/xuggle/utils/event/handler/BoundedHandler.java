@@ -74,7 +74,7 @@ public class BoundedHandler<E extends IEvent>
    * @throws IllegalArgumentException if maxTimesToCallHandler <= 0
    * @throws IllegalArgumentException if proxiedHandler == null
    */
-  protected BoundedHandler(
+  BoundedHandler(
       final int maxTimesToCallHandler,
       final IEventHandler<E> proxiedHandler
       )

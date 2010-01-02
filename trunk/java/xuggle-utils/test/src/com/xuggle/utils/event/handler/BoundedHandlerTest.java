@@ -68,7 +68,7 @@ public class BoundedHandlerTest
     TestEvent event = new TestEvent(source);
 
     int maxCalls = 4;
-    BoundedHandler<TestEvent> handler = Handler.getBoundedHandler(
+    BoundedHandler<TestEvent> handler = Handler.makeBoundedHandler(
         maxCalls,
         new MockNullEventHandler<TestEvent>()
         );

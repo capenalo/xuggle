@@ -59,7 +59,7 @@ public class Handler
    * @return the new handler
    */
 
-  public static ForwardingHandler getForwardingHandler(
+  public static ForwardingHandler makeForwardingHandler(
       IEventDispatcher dispatcherToForwardTo)
   {
     return new ForwardingHandler(dispatcherToForwardTo);
@@ -74,7 +74,7 @@ public class Handler
    * @return new handler
    */
 
-  public static <E extends IEvent> BoundedHandler<E> getBoundedHandler(
+  public static <E extends IEvent> BoundedHandler<E> makeBoundedHandler(
       int maxTimesToCall,
       IEventHandler<E> proxiedHandler
   )
@@ -93,7 +93,7 @@ public class Handler
    * @return the handler
    */
 
-  public static <E extends IEvent> TargetedHandler<E> getTargetedHandler(
+  public static <E extends IEvent> TargetedHandler<E> makeTargetedHandler(
       Object source,
       IEventHandler<E> proxiedHandler)
       {
@@ -111,14 +111,14 @@ public class Handler
    * @return A handler you can use on {@link IEventHandler}
    */
 
-  public static <E extends IEvent> IEventHandler<E> getTargetedAndBoundedHandler(
+  public static <E extends IEvent> IEventHandler<E> makeTargetedAndBoundedHandler(
       Object source,
       int maxTimesToCall,
       IEventHandler<E> proxiedHandler)
       {
-    BoundedHandler<E> bHandler = getBoundedHandler(maxTimesToCall,
+    BoundedHandler<E> bHandler = makeBoundedHandler(maxTimesToCall,
         proxiedHandler);
-    TargetedHandler<E> tHandler = getTargetedHandler(source, bHandler);
+    TargetedHandler<E> tHandler = makeTargetedHandler(source, bHandler);
     return tHandler;
       }
 

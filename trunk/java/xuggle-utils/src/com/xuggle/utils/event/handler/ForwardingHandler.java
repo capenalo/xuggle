@@ -49,7 +49,7 @@ public class ForwardingHandler implements IEventHandler<IEvent>
    *   has any required handlers registered.
    */
   
-  protected ForwardingHandler(IEventDispatcher aDispatcher)
+  ForwardingHandler(IEventDispatcher aDispatcher)
   {
     if (aDispatcher == null)
       throw new IllegalArgumentException("need dispatcher to dispatch to");
