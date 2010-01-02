@@ -29,6 +29,8 @@ import java.util.UUID;
  */
 public class TestUtils
 {
+  private TestUtils() {}
+  
   /**
    * This method returns the name of the method that called it.
    * @return the name of the calling method, or a unique name if unknown.

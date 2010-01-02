@@ -77,7 +77,7 @@ public class StateMachine implements IEventHandlerRegistrable
       this.mState = initialState;
     }
 
-    /** Convience dipsatch function which just passes through to the
+    /** Convenience dispatch function which just passes through to the
      * internal event dispatcher.
      * 
      * @param event The event to dispatch

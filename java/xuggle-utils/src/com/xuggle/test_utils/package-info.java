@@ -17,5 +17,8 @@
  * along with Xuggler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * A set of Xuggle utilities that are useful for running with <a href="http://junit.org/">JUnit</a>.
+ */
 package com.xuggle.test_utils;
 

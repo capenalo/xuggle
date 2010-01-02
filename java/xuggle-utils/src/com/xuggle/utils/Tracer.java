@@ -190,7 +190,6 @@ public class Tracer
   /**
    * Return the original tracer of this tracer.
    * 
-   * @param source the source object to match against
    * @return the found ancestor or null of no matching ancestor found
    */
 
@@ -209,7 +208,7 @@ public class Tracer
    * function performs a simple subtraction between the time stamps: passed -
    * this.
    * 
-   * @param the the tracer to who's timestamp will be subtract from this
+   * @param tracer the tracer to who's time stamp will be subtract from this
    *        tracers time stamp.
    * @param unit the unit of the desired result
    * @return the difference between this tracer and the passed tracers time

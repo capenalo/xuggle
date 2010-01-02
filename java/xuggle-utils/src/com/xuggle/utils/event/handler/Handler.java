@@ -27,16 +27,23 @@ import com.xuggle.utils.event.IEventHandler;
 import com.xuggle.utils.event.IEventHandlerRegistrable;
 
 /**
- * A collection of convenience methods for registering handlers and
- * creating special handlers.
+ * A collection of convenience methods for registering handlers and creating
+ * special handlers.
  * <p>
- * These are provided here because static generic function provide some
- * slight java compiler convenience.
+ * These are provided here because static generic function provide some slight
+ * java compiler convenience.
  * </p>
+ * <p>
+ * In particular, the
+ * {@link Handler#register(IEventHandlerRegistrable, int, Class, Object, int, IEventHandler)}
+ * set of functions provide a very convenient way to register
+ * {@link IEventHandler} objects for different {@link IEventHandlerRegistrable}
+ * objects.
+ * </p>
+ * 
  * @author aclarke
- *
+ * 
  */
-
 public class Handler
 {
 
