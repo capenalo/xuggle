@@ -28,7 +28,7 @@ public class State implements IState
     /** string name of the state, not intended to be a unique identifer
      * for the state */
     
-    private String name;
+    private String mName;
 
     /** Construct a state. 
      *
@@ -37,7 +37,7 @@ public class State implements IState
 
     public State(String name)
     {
-      this.name = name;
+      this.mName = name;
     }
 
     /** {@inheritDoc} */
@@ -55,6 +55,6 @@ public class State implements IState
 
     public String getName()
     {
-      return name;
+      return mName;
     }
 }
