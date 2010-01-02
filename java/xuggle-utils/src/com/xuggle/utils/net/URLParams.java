@@ -37,6 +37,8 @@ import com.xuggle.utils.collections.KeyValuePair;
  */
 public class URLParams
 {
+  private URLParams() {}
+  
   /**
    * Parse the query string, placing the results in <code>paramsToFill</code>,
    * assuming UTF-8 encoding.
