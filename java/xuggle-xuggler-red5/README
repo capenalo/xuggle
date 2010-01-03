@@ -1,0 +1,27 @@
+Welcome to Xuggle-Xuggler-Red5
+
+= Licensing =
+
+Xuggle-Xuggler-Red5 is licensed under the Lesser GNU Public License.
+
+See the COPYING file for our license, along with the amending
+COPYING.LESSER file.
+
+= What is Xuggle-Xuggler-Red5 ? =
+
+Xuggle-Xuggler-Red5 is a Java library that integrates
+Xuggle-Xuggler-Main (Xuggler) with the Red5 LGPL Open Source
+Media Server project.
+
+= Where can I find documentation? =
+Visit http://www.xuggle.com/xuggler/doc
+
+or build the documentaiton yourself:
+  ant doc
+and then open up
+  doc/java/api/index.html (the Java docs).
+
+= Where can I find out more? =
+Visit:
+http://www.xuggle.com/xuggler
+
