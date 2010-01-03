@@ -1,0 +1,31 @@
+Welcome to Xuggle-Utils
+
+= Licensing =
+
+Xuggle-Utils is licensed under the Lesser GNU Public License.
+
+See the COPYING file for our license, along with the amending
+COPYING.LESSER file.
+
+= What is Xuggle-Utils ? =
+
+Xuggle-Utils is a collection of utility classes that Xuggle
+has decided to open-source.  We use these classes extensively
+in our closed-source code.
+
+Examples of classes found here are a Decoupled Event Dispatching
+model (similar to ActionScript's EventDispatcher model), and
+a State Machine implementation.
+
+= Where can I find documentation? =
+Visit http://www.xuggle.com/xuggler/doc
+
+or build the documentaiton yourself:
+  ant doc
+and then open up
+  doc/java/api/index.html (the Java docs).
+
+= Where can I find out more? =
+Visit:
+http://www.xuggle.com/xuggler
+
