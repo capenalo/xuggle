@@ -42,6 +42,7 @@ import org.red5.server.messaging.OOBControlMessage;
 import org.red5.server.messaging.PipeConnectionEvent;
 import org.red5.server.net.rtmp.event.AudioData;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
+import org.red5.server.net.rtmp.event.Notify;
 import org.red5.server.net.rtmp.event.VideoData;
 import org.red5.server.stream.VideoCodecFactory;
 import org.red5.server.stream.codec.StreamCodecInfo;
@@ -288,5 +289,11 @@ public class BroadcastStream implements IBroadcastStream, IProvider, IPipeConnec
   public long getCreationTime()
   {
     return mCreationTime != null ? mCreationTime : 0L;
+  }
+
+  @Override
+  public Notify getMetaData()
+  {
+    return null;
   }
 }
