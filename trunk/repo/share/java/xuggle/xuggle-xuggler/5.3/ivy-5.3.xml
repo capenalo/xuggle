@@ -1,6 +1,6 @@
 <ivy-module version="1.0" xmlns:m="http://ant.apache.org/ivy/maven">
 
-  <info organisation="xuggle" module="xuggle-xuggler" revision="5.3" status="integration" publication="20120404175124"/>
+  <info organisation="xuggle" module="xuggle-xuggler" revision="5.3" status="integration" publication="20120404184921"/>
 
   <configurations>
     <conf name="default"/>
