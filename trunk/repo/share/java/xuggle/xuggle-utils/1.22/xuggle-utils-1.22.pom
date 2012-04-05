@@ -1,0 +1,134 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>xuggle</groupId>
+  <artifactId>xuggle-utils</artifactId>
+  <name>xuggle-utils</name>
+  <version>1.22</version>
+  <description>Xuggle Utility Library</description>
+  <url>www.xuggle.com</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+
+  <issueManagement>
+    <system>Google Code</system>
+    <url>http://code.google.com/p/xuggle/issues/list</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Hudson</system>
+    <url>http://build.xuggle.com/</url>
+  </ciManagement>
+  <developers>
+    <developer>
+      <id>aclarke</id>
+      <name>Art Clarke</name>
+      <email>aclarke@xuggle.com</email>
+      <url>www.xuggle.com</url>
+      <organization>Xuggle Inc.</organization>
+      <organizationUrl>www.xuggle.com</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>trebor</id>
+      <name>Robert Harris</name>
+      <email>trebor@xuggle.com</email>
+      <url>www.xuggle.com</url>
+      <organization>Xuggle Inc.</organization>
+      <organizationUrl>www.xuggle.com</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <scm>
+    <url>http://github.com/xuggle/xuggle-utils</url>
+  </scm>
+  <organization>
+    <name>Xuggle</name>
+    <url>www.xuggle.com</url>
+  </organization>
+  <build>
+    <plugins>
+
+      <!-- enable java 6 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+    </plugins>
+
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+  </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+
+        <configuration>
+          <doclet>gr.spinellis.umlgraph.doclet.UmlGraphDoc</doclet>
+          <docletArtifact>
+            <groupId>gr.spinellis</groupId>
+            <artifactId>UmlGraph</artifactId>
+            <version>4.4</version>
+          </docletArtifact>
+          <additionalparam>
+            -horizontal -qualify -postfixpackage
+            -useimports -views
+            -nodefillcolor grey80 -nodefontsize 15
+            -nodefontcolor grey20
+          </additionalparam>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+
+    </plugins>
+  </reporting>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>corp1</id>
+      <name>Xuggle Repository</name>
+      <url>file://${env.XUGGLE_REPO}/</url>
+      <layout>default</layout>
+    </repository>
+    <snapshotRepository>
+      <uniqueVersion>true</uniqueVersion>
+      <id>propSnap</id>
+      <name>Propellors Snapshots</name>
+      <url>sftp://propellers.net/maven</url>
+      <layout>legacy</layout>
+    </snapshotRepository>
+  </distributionManagement>
+</project>
