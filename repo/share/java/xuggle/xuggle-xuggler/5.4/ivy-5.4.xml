@@ -1,0 +1,42 @@
+<ivy-module version="1.0" xmlns:m="http://ant.apache.org/ivy/maven">
+
+  <info organisation="xuggle" module="xuggle-xuggler" revision="5.4" status="integration" publication="20120406175804"/>
+
+  <configurations>
+    <conf name="default"/>
+    
+    
+    
+  </configurations>
+
+  <publications>
+    <artifact type="pom" ext="pom" conf="default"/>
+    <artifact type="jar" ext="jar" conf="default"/>
+    <artifact name="xuggle-xuggler-noarch" type="jar" conf="default" ext="jar"/>
+
+    <!--
+      To publish sources to a maven repo, the
+      m:classifier="sources" is required.
+    -->
+    
+  </publications>
+
+  <dependencies defaultconf="default">
+    <!-- compile dependencies -->
+    <!-- Logging --> 
+    <dependency org="org.slf4j" name="slf4j-api" conf="default->master" rev="1.6.4"/>
+    <!-- Command line processing -->
+    <dependency org="commons-cli" name="commons-cli" conf="default->master" rev="1.1"/>
+
+    <!-- runtime dependencies; although not really -->
+    <dependency org="ch.qos.logback" name="logback-core" conf="default->master" rev="1.0.0"/>
+    <dependency org="ch.qos.logback" name="logback-classic" conf="default->master" rev="1.0.0"/>
+
+    <!-- testing dependencies -->
+    <!--  Include for JUnit Test framework -->
+    
+    <!-- Our internal libraries -->
+    
+  </dependencies>
+
+</ivy-module>
